@@ -61,6 +61,13 @@ npm run build
 cp .env.example .env
 ```
 
+Atur untuk konek ke API
+```bash
+SERVICES_MEDICINE_API_EMAIL=example@gmail.com
+SERVICES_MEDICINE_API_PASSWORD='085xxxxx'
+MEDICINE_API_BASE_URL=http://
+```
+
 5. Generate Application Key
 ```bash
 php artisan key:generate
