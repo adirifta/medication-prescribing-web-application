@@ -27,59 +27,109 @@
         <div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen">
             <!-- Logo -->
             <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
+                @php
+                    $user = Auth::user();
+                    $isAdmin = $user->role === 'admin';
+                    $isDoctor = $user->role === 'doctor';
+                    $isPharmacist = $user->role === 'pharmacist';
+                @endphp
+
+                <a href="{{ $isAdmin ? route('admin.dashboard') : ($isDoctor ? route('doctor.dashboard') : route('pharmacist.dashboard')) }}"
+                   class="flex items-center space-x-3">
                     <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
                         <i class="fas fa-pills text-white"></i>
                     </div>
                     <div>
                         <h1 class="text-lg font-bold text-gray-900 dark:text-white">MediScript Pro</h1>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            @if($isAdmin) Admin Panel
+                            @elseif($isDoctor) Doctor Panel
+                            @else Pharmacist Panel
+                            @endif
+                        </p>
                     </div>
                 </a>
             </div>
 
             <!-- Navigation -->
             <nav class="p-4 space-y-2">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                <!-- Dashboard Link -->
+                <a href="{{ $isAdmin ? route('admin.dashboard') : ($isDoctor ? route('doctor.dashboard') : route('pharmacist.dashboard')) }}"
+                   class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('*.dashboard') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
                     <i class="fas fa-tachometer-alt w-5"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <div class="pt-2">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Manajemen</p>
-                    <a href="{{ route('admin.users.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
-                        <i class="fas fa-users w-5"></i>
-                        <span>Users</span>
-                    </a>
-                    <a href="{{ route('admin.patients.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.patients.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
-                        <i class="fas fa-user-injured w-5"></i>
-                        <span>Patients</span>
-                    </a>
-                    <a href="{{ route('admin.reports') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
-                        <i class="fas fa-file-prescription w-5"></i>
-                        <span>Reports</span>
-                    </a>
-                </div>
+                <!-- Admin Navigation -->
+                @if($isAdmin)
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Manajemen</p>
+                        <a href="{{ route('admin.users.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-users w-5"></i>
+                            <span>Users</span>
+                        </a>
+                        <a href="{{ route('admin.patients.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.patients.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-user-injured w-5"></i>
+                            <span>Patients</span>
+                        </a>
+                    </div>
 
-                <div class="pt-2">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Laporan</p>
-                    <a href="{{ route('admin.reports') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                        <i class="fas fa-chart-line w-5"></i>
-                        <span>Revenue Report</span>
-                    </a>
-                    <a href="{{ route('admin.audit-logs.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
-                        <i class="fas fa-history w-5"></i>
-                        <span>Audit Logs</span>
-                    </a>
-                </div>
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Laporan</p>
+                        <a href="{{ route('admin.audit-logs.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.audit-logs.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-history w-5"></i>
+                            <span>Audit Logs</span>
+                        </a>
+                    </div>
 
-                <div class="pt-2">
-                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Pengaturan</p>
-                    <a href="" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
-                        <i class="fas fa-cog w-5"></i>
-                        <span>Settings</span>
-                    </a>
-                </div>
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Pengaturan</p>
+                        <a href="{{ route('admin.settings.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.settings.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-cog w-5"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+
+                <!-- Doctor Navigation -->
+                @elseif($isDoctor)
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Manajemen</p>
+                        <a href="{{ route('doctor.patients.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('doctor.patients.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-user-injured w-5"></i>
+                            <span>Patients</span>
+                        </a>
+                        <a href="{{ route('doctor.examinations.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('doctor.examinations.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-file-medical w-5"></i>
+                            <span>Examinations</span>
+                        </a>
+                    </div>
+
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Riwayat</p>
+                        <a href="{{ route('doctor.examinations.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                            <i class="fas fa-history w-5"></i>
+                            <span>History</span>
+                        </a>
+                    </div>
+
+                <!-- Pharmacist Navigation -->
+                @elseif($isPharmacist)
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Manajemen</p>
+                        <a href="{{ route('pharmacist.prescriptions.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('pharmacist.prescriptions.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                            <i class="fas fa-prescription w-5"></i>
+                            <span>Prescriptions</span>
+                        </a>
+                    </div>
+
+                    <div class="pt-2">
+                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Laporan</p>
+                        <a href="{{ route('pharmacist.prescriptions.index', ['status' => 'completed']) }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                            <i class="fas fa-file-pdf w-5"></i>
+                            <span>Completed</span>
+                        </a>
+                    </div>
+                @endif
             </nav>
 
             <!-- User Profile -->
@@ -90,7 +140,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->role }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 capitalize">{{ Auth::user()->role }}</p>
                     </div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -120,7 +170,7 @@
             </header>
 
             <main class="p-8">
-                {{ $slot }}
+                @yield('content')
             </main>
         </div>
     </div>
@@ -135,7 +185,14 @@
                         <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
+                        @php
+                            $user = Auth::user();
+                            $isAdmin = $user->role === 'admin';
+                            $isDoctor = $user->role === 'doctor';
+                            $isPharmacist = $user->role === 'pharmacist';
+                        @endphp
+                        <a href="{{ $isAdmin ? route('admin.dashboard') : ($isDoctor ? route('doctor.dashboard') : route('pharmacist.dashboard')) }}"
+                           class="flex items-center space-x-2">
                             <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
                                 <i class="fas fa-pills text-white"></i>
                             </div>
@@ -169,42 +226,70 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-base font-medium text-gray-900 dark:text-white">MediScript Pro</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                @if($isAdmin) Admin Panel
+                                @elseif($isDoctor) Doctor Panel
+                                @else Pharmacist Panel
+                                @endif
+                            </p>
                         </div>
                     </div>
 
                     <nav class="mt-5 px-2 space-y-1">
-                        <a href="{{ route('admin.dashboard') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                        <!-- Dashboard Link -->
+                        <a href="{{ $isAdmin ? route('admin.dashboard') : ($isDoctor ? route('doctor.dashboard') : route('pharmacist.dashboard')) }}"
+                           class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
                             <i class="fas fa-tachometer-alt mr-4 text-gray-400 group-hover:text-gray-500"></i>
                             Dashboard
                         </a>
 
-                        <a href="{{ route('admin.users.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                            <i class="fas fa-users mr-4 text-gray-400 group-hover:text-gray-500"></i>
-                            Users
-                        </a>
-
-                        <a href="{{ route('admin.patients.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                            <i class="fas fa-user-injured mr-4 text-gray-400 group-hover:text-gray-500"></i>
-                            Patients
-                        </a>
-
-                        <a href="" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                            <i class="fas fa-file-prescription mr-4 text-gray-400 group-hover:text-gray-500"></i>
-                            Prescriptions
-                        </a>
-
-                        <div class="pt-4">
-                            <p class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Laporan</p>
-                            <a href="" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                <i class="fas fa-chart-line mr-4 text-gray-400 group-hover:text-gray-500"></i>
-                                Revenue Report
+                        <!-- Admin Navigation -->
+                        @if($isAdmin)
+                            <a href="{{ route('admin.users.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-users mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Users
                             </a>
-                            <a href="{{ route('admin.audit-logs.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
-                                <i class="fas fa-history mr-4 text-gray-400 group-hover:text-gray-500"></i>
-                                Audit Logs
+
+                            <a href="{{ route('admin.patients.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-user-injured mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Patients
                             </a>
-                        </div>
+
+                            <div class="pt-4">
+                                <p class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Laporan</p>
+                                <a href="{{ route('admin.audit-logs.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                    <i class="fas fa-history mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                    Audit Logs
+                                </a>
+                            </div>
+
+                        <!-- Doctor Navigation -->
+                        @elseif($isDoctor)
+                            <a href="{{ route('doctor.patients.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-user-injured mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Patients
+                            </a>
+
+                            <a href="{{ route('doctor.examinations.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-file-medical mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Examinations
+                            </a>
+
+                        <!-- Pharmacist Navigation -->
+                        @elseif($isPharmacist)
+                            <a href="{{ route('pharmacist.prescriptions.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-prescription mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Prescriptions
+                            </a>
+
+                            <div class="pt-4">
+                                <p class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Laporan</p>
+                                <a href="{{ route('pharmacist.prescriptions.index', ['status' => 'completed']) }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                    <i class="fas fa-file-pdf mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                    Completed
+                                </a>
+                            </div>
+                        @endif
                     </nav>
                 </div>
 
@@ -216,7 +301,7 @@
                             </div>
                             <div class="ml-3">
                                 <p class="text-base font-medium text-gray-900 dark:text-white">{{ Auth::user()->name }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Administrator</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 capitalize">{{ Auth::user()->role }}</p>
                             </div>
                         </div>
 
@@ -236,7 +321,7 @@
 
         <!-- Mobile Main Content -->
         <main class="p-4">
-            {{ $slot }}
+           @yield('content')
         </main>
     </div>
 
@@ -268,6 +353,44 @@
                 }
             });
         }
+
+        // Theme toggle for desktop
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+        }
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const isDark = localStorage.getItem('theme') === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+                if (themeIconMobile) {
+                    themeIconMobile.classList.remove('fa-moon');
+                    themeIconMobile.classList.add('fa-sun');
+                }
+            }
+        });
     </script>
 
     @stack('scripts')

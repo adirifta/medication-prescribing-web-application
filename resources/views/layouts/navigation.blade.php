@@ -75,7 +75,9 @@
                                 </svg>
                             </div>
                         </button>
-                    </x-slot>
+                    @endsection
+
+@section('content')
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
@@ -91,7 +93,9 @@
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
-                    </x-slot>
+                    @endsection
+
+@section('content')
                 </x-dropdown>
             </div>
 

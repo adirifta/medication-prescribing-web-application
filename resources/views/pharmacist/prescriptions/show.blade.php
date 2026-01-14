@@ -1,54 +1,84 @@
-{{-- resources/views/pharmacist/prescriptions/show.blade.php --}}
-<x-app-layout>
-    <x-slot name="header">
+@extends('layouts.app')
+
+@section('title', 'Page Title')
+
+@section('header')
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Prescription Details') }}
-            </h2>
-            <div class="flex space-x-2">
-                <a href="{{ route('pharmacist.prescriptions.index', ['status' => $prescription->status]) }}" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400">
-                    ← Back to List
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Prescription Details') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Prescription #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}
+                </p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('pharmacist.prescriptions.index', ['status' => $prescription->status]) }}"
+                   class="btn btn-secondary flex items-center gap-2">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to List
                 </a>
-                <a href="{{ route('pharmacist.prescriptions.print', $prescription->id) }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                <a href="{{ route('pharmacist.prescriptions.print', $prescription->id) }}" target="_blank"
+                   class="btn btn-primary flex items-center gap-2">
+                    <i class="fas fa-print"></i>
                     Print
                 </a>
             </div>
         </div>
-    </x-slot>
+    @endsection
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('content')
+
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Prescription Header -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div class="mb-4 md:mb-0">
-                            <h3 class="text-2xl font-bold text-gray-900">
-                                Prescription #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}
-                            </h3>
-                            <div class="mt-2 flex items-center space-x-4">
-                                <span class="px-3 py-1 text-sm font-semibold rounded-full
-                                    {{ $prescription->status == 'completed' ? 'bg-green-100 text-green-800' :
-                                       ($prescription->status == 'processed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                    {{ ucfirst($prescription->status) }}
-                                </span>
-                                <div class="text-sm text-gray-500">
-                                    Created {{ $prescription->created_at->format('d M Y') }}
+            <div class="card mb-6">
+                <div class="p-8">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-file-prescription text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    Prescription #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}
+                                </h3>
+                                <div class="flex flex-wrap items-center gap-3 mt-2">
+                                    @php
+                                        $statusConfig = [
+                                            'waiting' => ['color' => 'yellow', 'icon' => 'fa-clock'],
+                                            'processed' => ['color' => 'blue', 'icon' => 'fa-capsules'],
+                                            'completed' => ['color' => 'green', 'icon' => 'fa-check-circle'],
+                                        ];
+                                        $config = $statusConfig[$prescription->status] ?? ['color' => 'gray', 'icon' => 'fa-circle'];
+                                    @endphp
+                                    <span class="badge bg-{{ $config['color'] }}-100 text-{{ $config['color'] }}-800 dark:bg-{{ $config['color'] }}-900 dark:text-{{ $config['color'] }}-200">
+                                        <i class="fas {{ $config['icon'] }} mr-1"></i>
+                                        {{ ucfirst($prescription->status) }}
+                                    </span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $prescription->created_at->format('d F Y') }}
+                                    </span>
+                                    @if($prescription->processed_at)
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        <i class="fas fa-history mr-1"></i>
+                                        Processed: {{ $prescription->processed_at->format('d M Y') }}
+                                    </span>
+                                    @endif
                                 </div>
-                                @if($prescription->processed_at)
-                                <div class="text-sm text-gray-500">
-                                    Processed {{ $prescription->processed_at->format('d M Y') }}
-                                </div>
-                                @endif
                             </div>
                         </div>
 
-                        <div class="text-right">
-                            <div class="text-3xl font-bold text-gray-900">
-                                {{ $prescription->formatted_total_price }}
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                {{ $prescription->items->count() }} medicines
+                        <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 min-w-[200px]">
+                            <div class="text-center">
+                                <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Amount</div>
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $prescription->formatted_total_price }}
+                                </div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                    {{ $prescription->items->count() }} items
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -56,73 +86,114 @@
             </div>
 
             <!-- Patient and Doctor Info -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Patient Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Patient Information</h4>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-user-injured text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Patient Information</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-user text-blue-600 dark:text-blue-400"></i>
+                                </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $prescription->examination->patient->name }}</div>
-                                    <div class="text-sm text-gray-500">MRN: {{ $prescription->examination->patient->medical_record_number }}</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $prescription->examination->patient->name }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        MRN: {{ $prescription->examination->patient->medical_record_number }}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                                <div class="text-sm text-gray-900">{{ $prescription->examination->patient->phone }}</div>
+                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-phone text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $prescription->examination->patient->phone }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Phone Number
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="flex items-start">
-                                <svg class="h-5 w-5 text-gray-400 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <div class="text-sm text-gray-900">{{ $prescription->examination->patient->address ?? 'No address provided' }}</div>
+                            @if($prescription->examination->patient->address)
+                            <div class="flex items-start p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mr-3 mt-1">
+                                    <i class="fas fa-home text-yellow-600 dark:text-yellow-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">Address</div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        {{ $prescription->examination->patient->address }}
+                                    </div>
+                                </div>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
                 <!-- Doctor and Examination Info -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Doctor & Examination</h4>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-user-md text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Doctor & Examination</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-stethoscope text-blue-600 dark:text-blue-400"></i>
+                                </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $prescription->doctor->name }}</div>
-                                    <div class="text-sm text-gray-500">Doctor</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        Dr. {{ $prescription->doctor->name }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Attending Doctor
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-calendar-check text-green-600 dark:text-green-400"></i>
+                                </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $prescription->examination->formatted_examination_date }}</div>
-                                    <div class="text-sm text-gray-500">Examination Date</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $prescription->examination->formatted_examination_date }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Examination Date
+                                    </div>
                                 </div>
                             </div>
 
                             @if($prescription->pharmacist)
-                            <div class="flex items-center">
-                                <svg class="h-5 w-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
+                            <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-prescription-bottle-alt text-purple-600 dark:text-purple-400"></i>
+                                </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-900">{{ $prescription->pharmacist->name }}</div>
-                                    <div class="text-sm text-gray-500">Pharmacist</div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $prescription->pharmacist->name }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        Processing Pharmacist
+                                    </div>
                                 </div>
                             </div>
                             @endif
@@ -133,74 +204,100 @@
 
             <!-- Prescription Notes -->
             @if($prescription->notes)
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card mb-6">
                 <div class="p-6">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Doctor Notes</h4>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <p class="text-gray-700">{{ $prescription->notes }}</p>
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-notes-medical text-yellow-600 dark:text-yellow-400"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Doctor Notes</h3>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                        <p class="text-gray-700 dark:text-gray-300">{{ $prescription->notes }}</p>
                     </div>
                 </div>
             </div>
             @endif
 
             <!-- Medicine List -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card mb-6">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">Medicine List</h4>
-                        <div class="text-sm text-gray-500">{{ $prescription->items->count() }} items</div>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-pills text-green-600 dark:text-green-400"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Medicine List</h3>
+                        </div>
+                        <div class="badge badge-primary">
+                            <i class="fas fa-capsules mr-1"></i>
+                            {{ $prescription->items->count() }} items
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Medicine
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Quantity
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Unit Price
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Subtotal
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Instructions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($prescription->items as $item)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $item->medicine_name }}</div>
-                                        <div class="text-xs text-gray-500">ID: {{ $item->medicine_id }}</div>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <td class="px-4 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                                <i class="fas fa-pill text-blue-600 dark:text-blue-400 text-xs"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ $item->medicine_name }}
+                                                </div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    ID: {{ $item->medicine_id }}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $item->quantity }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-900 dark:text-white">{{ $item->quantity }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $item->formatted_unit_price }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-900 dark:text-white">{{ $item->formatted_unit_price }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $item->formatted_subtotal }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $item->formatted_subtotal }}</div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900">{{ $item->instructions ?? 'Take as directed' }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">{{ $item->instructions ?? 'Take as directed' }}</div>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot class="bg-gray-50">
+                            <tfoot class="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <td colspan="3" class="px-6 py-4 text-right text-sm font-medium text-gray-900">
-                                        Total:
+                                    <td colspan="3" class="px-4 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
+                                        Total Amount:
                                     </td>
-                                    <td colspan="2" class="px-6 py-4 text-lg font-bold text-gray-900">
-                                        {{ $prescription->formatted_total_price }}
+                                    <td colspan="2" class="px-4 py-4">
+                                        <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                                            {{ $prescription->formatted_total_price }}
+                                        </div>
                                     </td>
                                 </tr>
                             </tfoot>
@@ -210,59 +307,65 @@
             </div>
 
             <!-- Actions -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div>
-                            @if($prescription->status == 'waiting')
-                            <div class="flex items-center text-yellow-600">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="text-sm font-medium">Waiting to be processed</span>
+                            <div class="flex items-center mb-2">
+                                @if($prescription->status == 'waiting')
+                                <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-clock text-yellow-600 dark:text-yellow-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-yellow-600 dark:text-yellow-400">Waiting to be processed</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Created: {{ $prescription->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                                @elseif($prescription->status == 'processed')
+                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-capsules text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-blue-600 dark:text-blue-400">Processed - Ready for completion</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Processed: {{ $prescription->processed_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                                @else
+                                <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-check-circle text-green-600 dark:text-green-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-green-600 dark:text-green-400">Prescription Completed</div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Completed successfully
+                                    </div>
+                                </div>
+                                @endif
                             </div>
-                            @elseif($prescription->status == 'processed')
-                            <div class="flex items-center text-blue-600">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span class="text-sm font-medium">Processed - Ready for completion</span>
-                            </div>
-                            @else
-                            <div class="flex items-center text-green-600">
-                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
-                                <span class="text-sm font-medium">Completed</span>
-                            </div>
-                            @endif
                         </div>
 
-                        <div class="flex space-x-3">
-                            <a href="{{ route('pharmacist.prescriptions.export', $prescription->id) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="{{ route('pharmacist.prescriptions.export', $prescription->id) }}"
+                               class="btn btn-outline flex items-center gap-2 px-6">
+                                <i class="fas fa-file-pdf"></i>
                                 Download PDF
                             </a>
 
                             @if($prescription->status == 'waiting')
                             <form action="{{ route('pharmacist.prescriptions.process', $prescription->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                                <button type="submit" class="btn btn-primary flex items-center gap-2 px-6">
+                                    <i class="fas fa-play-circle"></i>
                                     Process Prescription
                                 </button>
                             </form>
                             @elseif($prescription->status == 'processed')
                             <form action="{{ route('pharmacist.prescriptions.complete', $prescription->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
+                                <button type="submit" class="btn btn-success flex items-center gap-2 px-6">
+                                    <i class="fas fa-check-circle"></i>
                                     Mark as Completed
                                 </button>
                             </form>
@@ -273,4 +376,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

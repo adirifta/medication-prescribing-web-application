@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Doctor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PatientRequest;
+use App\Models\Examination;
 use App\Repositories\PatientRepository;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,15 @@ class PatientController extends Controller
             ? $this->patientRepository->search($search)
             : $this->patientRepository->paginate(10);
 
-        return view('doctor.patients.index', compact('patients', 'search'));
+        $totalExaminations = Examination::count();
+        $todayVisits = Examination::whereDate('examination_date', today())->count();
+
+        return view('doctor.patients.index', compact(
+            'patients',
+            'search',
+            'totalExaminations',
+            'todayVisits'
+        ));
     }
 
     public function create()
