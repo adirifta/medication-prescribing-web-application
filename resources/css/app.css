@@ -1,0 +1,303 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary: 14 165 233;
+        --color-secondary: 100 116 139;
+        --color-medical: 34 197 94;
+        --color-gray: 107 114 128;
+    }
+
+    /* Dark mode base styles */
+    .dark {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply bg-gray-50 text-gray-800 transition-colors duration-300;
+    }
+
+    .dark body {
+        @apply bg-gray-900 text-gray-100;
+    }
+
+    /* Form elements dark mode */
+    input, textarea, select {
+        @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600
+               text-gray-900 dark:text-gray-100;
+    }
+
+    /* Links */
+    a {
+        @apply text-primary-600 dark:text-primary-400 hover:text-primary-700
+               dark:hover:text-primary-300 transition-colors;
+    }
+}
+
+@layer components {
+    /* Button Components */
+    .btn {
+        @apply px-4 py-2 rounded-lg font-medium transition-all duration-300
+               focus:outline-none focus:ring-2 focus:ring-offset-2
+               disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    /* Primary Button - Fixed for dark mode */
+    .btn-primary {
+        @apply bg-gradient-to-r from-primary-500 to-primary-600
+               hover:from-primary-600 hover:to-primary-700
+               text-white font-semibold
+               shadow-md hover:shadow-lg
+               focus:ring-primary-500 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+    }
+
+    .dark .btn-primary {
+        @apply from-primary-600 to-primary-700
+               hover:from-primary-700 hover:to-primary-800;
+    }
+
+    /* Secondary Button */
+    .btn-secondary {
+        @apply bg-white dark:bg-gray-800
+               border border-gray-300 dark:border-gray-700
+               text-gray-700 dark:text-gray-300
+               hover:bg-gray-50 dark:hover:bg-gray-700
+               hover:border-primary-300 dark:hover:border-primary-600
+               hover:text-primary-700 dark:hover:text-primary-400
+               shadow-sm hover:shadow
+               focus:ring-primary-500;
+    }
+
+    /* Medical Button */
+    .btn-medical {
+        @apply bg-gradient-to-r from-medical-500 to-medical-600
+               hover:from-medical-600 hover:to-medical-700
+               text-white font-semibold
+               shadow-md hover:shadow-lg
+               focus:ring-medical-500 focus:ring-offset-white dark:focus:ring-offset-gray-900;
+    }
+
+    /* Outline Button */
+    .btn-outline {
+        @apply border-2 border-primary-500 dark:border-primary-400
+               text-primary-600 dark:text-primary-400
+               hover:bg-primary-50 dark:hover:bg-primary-900/20
+               bg-transparent;
+    }
+
+    /* Card Components */
+    .card {
+        @apply bg-white dark:bg-gray-800
+               rounded-xl shadow-md hover:shadow-lg
+               border border-gray-200 dark:border-gray-700
+               transition-all duration-300;
+    }
+
+    /* Glass Card */
+    .glass-card {
+        @apply backdrop-blur-md bg-white/80 dark:bg-gray-800/80
+               border border-white/20 dark:border-gray-700/30
+               shadow-lg;
+    }
+
+    /* Form Components */
+    .form-input {
+        @apply w-full px-4 py-3 rounded-lg border
+               bg-white dark:bg-gray-800
+               border-gray-300 dark:border-gray-600
+               text-gray-900 dark:text-gray-100
+               placeholder-gray-500 dark:placeholder-gray-400
+               focus:ring-2 focus:ring-primary-500 focus:border-transparent
+               transition-all duration-200;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+    }
+
+    /* Navigation */
+    .nav-link {
+        @apply text-gray-600 dark:text-gray-400
+               hover:text-primary-600 dark:hover:text-primary-400
+               transition-colors duration-200;
+    }
+
+    .nav-link.active {
+        @apply text-primary-600 dark:text-primary-400 font-semibold;
+    }
+
+    /* Badge */
+    .badge {
+        @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    }
+
+    .badge-primary {
+        @apply bg-primary-100 text-primary-800
+               dark:bg-primary-900 dark:text-primary-200;
+    }
+
+    .badge-medical {
+        @apply bg-medical-100 text-medical-800
+               dark:bg-medical-900 dark:text-medical-200;
+    }
+
+    /* Alert */
+    .alert {
+        @apply p-4 rounded-lg border;
+    }
+
+    .alert-info {
+        @apply bg-blue-50 text-blue-800 border-blue-200
+               dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800;
+    }
+
+    .alert-success {
+        @apply bg-green-50 text-green-800 border-green-200
+               dark:bg-green-900/30 dark:text-green-200 dark:border-green-800;
+    }
+}
+
+@layer utilities {
+    /* Gradients */
+    .gradient-primary {
+        @apply bg-gradient-to-r from-primary-500 to-primary-700;
+    }
+
+    .gradient-medical {
+        @apply bg-gradient-to-r from-medical-500 to-medical-700;
+    }
+
+    .gradient-dark {
+        @apply bg-gradient-to-r from-gray-800 to-gray-900;
+    }
+
+    /* Animations */
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.3s ease-out;
+    }
+
+    /* Glass effect */
+    .glass {
+        @apply backdrop-blur-sm bg-white/10 dark:bg-gray-900/20
+               border border-white/20 dark:border-gray-700/30;
+    }
+
+    /* Text utilities */
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar {
+    width: 10px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+}
+
+/* Dashboard Specific Styles */
+@layer components {
+    /* Stat Cards */
+    .stat-card {
+        @apply bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg
+               transition-all duration-300 p-6 border border-gray-200 dark:border-gray-700;
+    }
+
+    /* Chart Container */
+    .chart-container {
+        @apply relative h-72;
+    }
+
+    /* Activity Item */
+    .activity-item {
+        @apply flex items-start p-4 rounded-lg border border-gray-200 dark:border-gray-700
+               hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors;
+    }
+
+    /* Badge Variants */
+    .badge-role-doctor {
+        @apply bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300;
+    }
+
+    .badge-role-pharmacist {
+        @apply bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300;
+    }
+
+    .badge-role-admin {
+        @apply bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-300;
+    }
+
+    .badge-role-patient {
+        @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300;
+    }
+
+    /* Table Styles */
+    .data-table {
+        @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+    }
+
+    .data-table th {
+        @apply px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400
+               uppercase tracking-wider bg-gray-50 dark:bg-gray-800;
+    }
+
+    .data-table td {
+        @apply px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300;
+    }
+
+    /* Progress Bars */
+    .progress-bar {
+        @apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2;
+    }
+
+    .progress-bar-fill {
+        @apply bg-primary-500 dark:bg-primary-600 h-2 rounded-full transition-all duration-300;
+    }
+}
+
+@layer utilities {
+    /* Grid Utilities */
+    .grid-auto-fit {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .grid-auto-fill {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    /* Animation Utilities */
+    .animate-pulse-slow {
+        animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .animate-bounce-slow {
+        animation: bounce 2s infinite;
+    }
+}
