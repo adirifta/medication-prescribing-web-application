@@ -1,89 +1,120 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Doctor Dashboard') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Doctor Dashboard') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Selamat datang, Dr. {{ auth()->user()->name }}
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ now()->format('l, d F Y') }}</div>
+                    <div class="text-xs text-gray-400 dark:text-gray-500">{{ now()->format('H:i') }} WIB</div>
+                </div>
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
+                </button>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <!-- Today's Examinations -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card hover:shadow-lg transition-shadow duration-300">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="rounded-lg bg-blue-100 p-3">
-                                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-white text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm text-gray-500">Today's Examinations</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $stats['today_examinations'] }}</p>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Today's Examinations</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $stats['today_examinations'] }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <i class="fas fa-arrow-up text-green-500 mr-1"></i>
+                                    {{ $stats['weekly_growth'] ?? 0 }}% this week
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Patients -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card hover:shadow-lg transition-shadow duration-300">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="rounded-lg bg-green-100 p-3">
-                                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.67 3.623a10.97 10.97 0 00-3.67-3.623" />
-                                </svg>
+                            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-user-injured text-white text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm text-gray-500">Total Patients</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $stats['total_patients'] }}</p>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Patients</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $stats['total_patients'] }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Active: {{ $stats['active_patients'] ?? 0 }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Pending Prescriptions -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card hover:shadow-lg transition-shadow duration-300">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="rounded-lg bg-yellow-100 p-3">
-                                <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
+                            <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-white text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm text-gray-500">Pending Prescriptions</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $stats['pending_prescriptions'] }}</p>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Prescriptions</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $stats['pending_prescriptions'] }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Waiting for pharmacist
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Completed Prescriptions -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card hover:shadow-lg transition-shadow duration-300">
                     <div class="p-6">
                         <div class="flex items-center">
-                            <div class="rounded-lg bg-purple-100 p-3">
-                                <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                </svg>
+                            <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-check-circle text-white text-xl"></i>
                             </div>
                             <div class="ml-4">
-                                <p class="text-sm text-gray-500">Completed</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $stats['completed_prescriptions'] }}</p>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Completed</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ $stats['completed_prescriptions'] }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    This month
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts and Recent Activities -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Charts and Quick Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <!-- Monthly Examinations Chart -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Monthly Examinations</h3>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Monthly Examinations</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-xs px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full">
+                                    This Year
+                                </button>
+                                <button class="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full">
+                                    Last Year
+                                </button>
+                            </div>
+                        </div>
                         <div class="h-64">
                             <canvas id="examinationsChart"></canvas>
                         </div>
@@ -91,53 +122,59 @@
                 </div>
 
                 <!-- Quick Actions -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Quick Actions</h3>
                         <div class="space-y-4">
-                            <a href="{{ route('doctor.examinations.create') }}" class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                                <div class="rounded-lg bg-blue-100 p-2">
-                                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
+                            <!-- New Examination -->
+                            <a href="{{ route('doctor.examinations.create') }}"
+                               class="flex items-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 transition-all duration-300 group">
+                                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-plus-circle text-white text-lg"></i>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="font-medium text-gray-900">New Examination</p>
-                                    <p class="text-sm text-gray-500">Create new patient examination</p>
+                                <div class="ml-4 flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                        New Examination
+                                    </p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        Create new patient examination
+                                    </p>
                                 </div>
-                                <svg class="ml-auto h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
+                                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-500 dark:group-hover:text-blue-400"></i>
                             </a>
 
-                            <a href="{{ route('doctor.patients.create') }}" class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition duration-200">
-                                <div class="rounded-lg bg-green-100 p-2">
-                                    <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                    </svg>
+                            <!-- Register New Patient -->
+                            <a href="{{ route('doctor.patients.create') }}"
+                               class="flex items-center p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg hover:from-green-100 hover:to-green-200 dark:hover:from-green-900/30 dark:hover:to-green-800/30 transition-all duration-300 group">
+                                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-user-plus text-white text-lg"></i>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="font-medium text-gray-900">Register New Patient</p>
-                                    <p class="text-sm text-gray-500">Add new patient to system</p>
+                                <div class="ml-4 flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">
+                                        Register New Patient
+                                    </p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        Add new patient to system
+                                    </p>
                                 </div>
-                                <svg class="ml-auto h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
+                                <i class="fas fa-chevron-right text-gray-400 group-hover:text-green-500 dark:group-hover:text-green-400"></i>
                             </a>
 
-                            <a href="{{ route('doctor.examinations.index') }}" class="flex items-center p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition duration-200">
-                                <div class="rounded-lg bg-yellow-100 p-2">
-                                    <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
+                            <!-- View All Examinations -->
+                            <a href="{{ route('doctor.examinations.index') }}"
+                               class="flex items-center p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-lg hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-900/30 dark:hover:to-purple-800/30 transition-all duration-300 group">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clipboard-list text-white text-lg"></i>
                                 </div>
-                                <div class="ml-4">
-                                    <p class="font-medium text-gray-900">View All Examinations</p>
-                                    <p class="text-sm text-gray-500">Browse examination history</p>
+                                <div class="ml-4 flex-1">
+                                    <p class="font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                                        View All Examinations
+                                    </p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        Browse examination history
+                                    </p>
                                 </div>
-                                <svg class="ml-auto h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
+                                <i class="fas fa-chevron-right text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400"></i>
                             </a>
                         </div>
                     </div>
@@ -145,72 +182,113 @@
             </div>
 
             <!-- Recent Examinations -->
-            <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Examinations</h3>
-                        <a href="{{ route('doctor.examinations.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            View All →
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Examinations</h3>
+                        <a href="{{ route('doctor.examinations.index') }}" class="btn btn-outline text-sm px-4 py-2">
+                            <i class="fas fa-eye mr-2"></i>
+                            View All
                         </a>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Patient
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Date
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                        Date & Time
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Status
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @forelse ($recentExaminations as $examination)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                        <td class="px-4 py-4">
                                             <div class="flex items-center">
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">
+                                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-user text-white text-sm"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
                                                         {{ $examination->patient->name }}
                                                     </div>
-                                                    <div class="text-sm text-gray-500">
-                                                        {{ $examination->patient->medical_record_number }}
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                        MR: {{ $examination->patient->medical_record_number }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $examination->formatted_examination_date }}</div>
+                                        <td class="px-4 py-4">
+                                            <div class="text-sm text-gray-900 dark:text-white">
+                                                {{ $examination->formatted_examination_date }}
+                                            </div>
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $examination->created_at->format('H:i') }}
+                                            </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="px-4 py-4">
                                             @php
-                                                $statusColors = [
-                                                    'pending' => 'bg-yellow-100 text-yellow-800',
-                                                    'processed' => 'bg-blue-100 text-blue-800',
-                                                    'completed' => 'bg-green-100 text-green-800',
+                                                $statusConfig = [
+                                                    'pending' => [
+                                                        'color' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                                                        'icon' => 'fas fa-clock'
+                                                    ],
+                                                    'processed' => [
+                                                        'color' => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                                                        'icon' => 'fas fa-spinner'
+                                                    ],
+                                                    'completed' => [
+                                                        'color' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                                                        'icon' => 'fas fa-check-circle'
+                                                    ],
                                                 ];
+                                                $config = $statusConfig[$examination->status] ?? ['color' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300', 'icon' => 'fas fa-circle'];
                                             @endphp
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColors[$examination->status] }}">
+                                            <span class="badge {{ $config['color'] }} flex items-center">
+                                                <i class="{{ $config['icon'] }} mr-1 text-xs"></i>
                                                 {{ ucfirst($examination->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
-                                            <a href="{{ route('doctor.examinations.show', $examination->id) }}" class="text-green-600 hover:text-green-900">View</a>
+                                        <td class="px-4 py-4">
+                                            <div class="flex space-x-2">
+                                                <a href="{{ route('doctor.examinations.edit', $examination->id) }}"
+                                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium">
+                                                    <i class="fas fa-edit mr-1"></i> Edit
+                                                </a>
+                                                <a href="{{ route('doctor.examinations.show', $examination->id) }}"
+                                                   class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm font-medium">
+                                                    <i class="fas fa-eye mr-1"></i> View
+                                                </a>
+                                                @if($examination->status === 'pending')
+                                                    <a href="{{ route('doctor.examinations.prescription', $examination->id) }}"
+                                                       class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 text-sm font-medium">
+                                                        <i class="fas fa-prescription-bottle-alt mr-1"></i> Prescribe
+                                                    </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                            No examinations found.
+                                        <td colspan="4" class="px-4 py-8 text-center">
+                                            <div class="text-gray-500 dark:text-gray-400">
+                                                <i class="fas fa-clipboard-list text-3xl mb-2"></i>
+                                                <p class="text-sm">No examinations found</p>
+                                                <a href="{{ route('doctor.examinations.create') }}" class="btn btn-primary mt-4 text-sm px-4 py-2">
+                                                    <i class="fas fa-plus mr-2"></i>
+                                                    Create First Examination
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -226,45 +304,119 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('examinationsChart').getContext('2d');
+            // Theme Toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
 
-            const months = @json($monthlyData->pluck('month'));
-            const counts = @json($monthlyData->pluck('count'));
+            if (localStorage.getItem('theme') === 'dark' ||
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                if (themeIcon) {
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            }
 
-            const chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months.map(month => {
-                        const [year, monthNum] = month.split('-');
-                        return new Date(year, monthNum - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                    }),
-                    datasets: [{
-                        label: 'Examinations',
-                        data: counts,
-                        borderColor: 'rgb(59, 130, 246)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+
+                    if (document.documentElement.classList.contains('dark')) {
+                        localStorage.setItem('theme', 'dark');
+                        themeIcon.classList.remove('fa-moon');
+                        themeIcon.classList.add('fa-sun');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                        themeIcon.classList.remove('fa-sun');
+                        themeIcon.classList.add('fa-moon');
+                    }
+
+                    // Update chart if exists
+                    if (window.examinationsChart) {
+                        window.examinationsChart.destroy();
+                        initExaminationsChart();
+                    }
+                });
+            }
+
+            // Examinations Chart
+            function initExaminationsChart() {
+                const ctx = document.getElementById('examinationsChart');
+                if (!ctx) return;
+
+                const months = @json($monthlyData->pluck('month'));
+                const counts = @json($monthlyData->pluck('count'));
+
+                const isDark = document.documentElement.classList.contains('dark');
+                const textColor = isDark ? '#d1d5db' : '#374151';
+                const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+                window.examinationsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months.map(month => {
+                            const [year, monthNum] = month.split('-');
+                            return new Date(year, monthNum - 1).toLocaleDateString('en-US', {
+                                month: 'short',
+                                year: 'numeric'
+                            });
+                        }),
+                        datasets: [{
+                            label: 'Examinations',
+                            data: counts,
+                            borderColor: '#3b82f6',
+                            backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                                titleColor: isDark ? '#f3f4f6' : '#111827',
+                                bodyColor: isDark ? '#d1d5db' : '#374151',
+                                borderColor: isDark ? '#374151' : '#e5e7eb',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: gridColor,
+                                    borderColor: gridColor,
+                                },
+                                ticks: {
+                                    color: textColor,
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: gridColor,
+                                    borderColor: gridColor,
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    stepSize: 1
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
+
+            // Initialize chart
+            initExaminationsChart();
         });
     </script>
     @endpush

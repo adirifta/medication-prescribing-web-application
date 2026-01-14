@@ -1,27 +1,80 @@
+{{-- resources/views/admin/settings/index.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('System Settings') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('System Settings') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Configure application and system preferences
+                </p>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Flash Messages -->
+            @if (session('success'))
+                <div class="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span class="text-green-800 dark:text-green-200">{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
+                        <span class="text-red-800 dark:text-red-200">{{ session('error') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Settings Tabs -->
+            <div class="mb-8">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="-mb-px flex space-x-8">
+                        <a href="{{ route('admin.settings.index') }}"
+                           class="border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 whitespace-nowrap py-4 px-1 text-sm font-medium">
+                            General Settings
+                        </a>
+                        <a href="{{ route('admin.settings.logs') }}"
+                           class="border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 text-sm font-medium">
+                            System Logs
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
             <!-- System Actions -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Cache Management -->
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Cache Management</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <i class="fas fa-broom mr-3 text-blue-500"></i>
+                            Cache Management
+                        </h3>
                         <div class="space-y-3">
                             <form action="{{ route('admin.settings.clear-cache') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <button type="submit"
+                                        onclick="return confirm('Clear all application cache?')"
+                                        class="btn btn-primary w-full">
+                                    <i class="fas fa-trash-alt mr-2"></i>
                                     Clear Application Cache
                                 </button>
                             </form>
                             <form action="{{ route('admin.settings.optimize') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <button type="submit"
+                                        onclick="return confirm('Optimize the application?')"
+                                        class="btn btn-medical w-full">
+                                    <i class="fas fa-bolt mr-2"></i>
                                     Optimize Application
                                 </button>
                             </form>
@@ -29,45 +82,61 @@
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Maintenance Mode -->
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Maintenance Mode</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <i class="fas fa-tools mr-3 text-yellow-500"></i>
+                            Maintenance Mode
+                        </h3>
                         <div class="space-y-3">
                             <form action="{{ route('admin.settings.maintenance') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="action" value="down">
-                                <button type="submit" class="w-full px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2">
+                                <button type="submit"
+                                        onclick="return confirm('Enable maintenance mode?')"
+                                        class="btn btn-secondary w-full">
+                                    <i class="fas fa-power-off mr-2"></i>
                                     Enable Maintenance Mode
                                 </button>
                             </form>
                             <form action="{{ route('admin.settings.maintenance') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="action" value="up">
-                                <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <button type="submit"
+                                        onclick="return confirm('Disable maintenance mode?')"
+                                        class="btn btn-primary w-full">
+                                    <i class="fas fa-play mr-2"></i>
                                     Disable Maintenance Mode
                                 </button>
                             </form>
                         </div>
-                        <div class="mt-4 text-sm text-gray-600">
-                            Current status:
-                            <span class="font-medium {{ $settings['maintenance_mode'] ? 'text-red-600' : 'text-green-600' }}">
-                                {{ $settings['maintenance_mode'] ? 'Maintenance Mode Active' : 'Application Running' }}
-                            </span>
+                        <div class="mt-4 text-sm {{ $settings['maintenance_mode'] ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
+                            <i class="fas fa-circle text-xs mr-2"></i>
+                            {{ $settings['maintenance_mode'] ? 'Maintenance Mode Active' : 'Application Running Normally' }}
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- System Tools -->
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">System Tools</h3>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <i class="fas fa-database mr-3 text-purple-500"></i>
+                            System Tools
+                        </h3>
                         <div class="space-y-3">
                             <form action="{{ route('admin.settings.backup') }}" method="POST">
                                 @csrf
-                                <button type="submit" class="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                                <button type="submit"
+                                        onclick="return confirm('Create system backup?')"
+                                        class="btn btn-secondary w-full">
+                                    <i class="fas fa-save mr-2"></i>
                                     Create Backup
                                 </button>
                             </form>
-                            <a href="{{ route('admin.settings.logs') }}" class="block w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center">
+                            <a href="{{ route('admin.settings.logs') }}" class="btn btn-outline w-full">
+                                <i class="fas fa-file-alt mr-2"></i>
                                 View System Logs
                             </a>
                         </div>
@@ -76,59 +145,139 @@
             </div>
 
             <!-- Application Settings Form -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-8">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Application Configuration</h3>
+            <div class="card mb-8">
+                <div class="p-8">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-8 flex items-center">
+                        <i class="fas fa-cog mr-3 text-primary-500"></i>
+                        Application Configuration
+                    </h3>
 
-                    <form action="{{ route('admin.settings.update') }}" method="POST" class="space-y-6">
+                    <form action="{{ route('admin.settings.update') }}" method="POST" class="space-y-8">
                         @csrf
                         @method('PUT')
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <!-- Application Name -->
                             <div>
-                                <label for="app_name" class="block text-sm font-medium text-gray-700">Application Name</label>
-                                <input type="text" id="app_name" name="app_name" value="{{ old('app_name', $settings['app_name']) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <label for="app_name" class="form-label">Application Name</label>
+                                <div class="relative">
+                                    <input type="text"
+                                           id="app_name"
+                                           name="app_name"
+                                           value="{{ old('app_name', $settings['app_name']) }}"
+                                           required
+                                           class="form-input pl-10"
+                                           placeholder="MediScript Pro">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-tag text-gray-400"></i>
+                                    </div>
+                                </div>
+                                @error('app_name')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Application URL -->
                             <div>
-                                <label for="app_url" class="block text-sm font-medium text-gray-700">Application URL</label>
-                                <input type="url" id="app_url" name="app_url" value="{{ old('app_url', $settings['app_url']) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <label for="app_url" class="form-label">Application URL</label>
+                                <div class="relative">
+                                    <input type="url"
+                                           id="app_url"
+                                           name="app_url"
+                                           value="{{ old('app_url', $settings['app_url']) }}"
+                                           required
+                                           class="form-input pl-10"
+                                           placeholder="https://example.com">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-globe text-gray-400"></i>
+                                    </div>
+                                </div>
+                                @error('app_url')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Medicine API Email -->
                             <div>
-                                <label for="medicine_api_email" class="block text-sm font-medium text-gray-700">Medicine API Email</label>
-                                <input type="email" id="medicine_api_email" name="medicine_api_email" value="{{ old('medicine_api_email', $settings['medicine_api_email']) }}" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <label for="medicine_api_email" class="form-label">Medicine API Email</label>
+                                <div class="relative">
+                                    <input type="email"
+                                           id="medicine_api_email"
+                                           name="medicine_api_email"
+                                           value="{{ old('medicine_api_email', $settings['medicine_api_email']) }}"
+                                           required
+                                           class="form-input pl-10"
+                                           placeholder="your-email@example.com">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-envelope text-gray-400"></i>
+                                    </div>
+                                </div>
+                                @error('medicine_api_email')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Medicine API Phone -->
                             <div>
-                                <label for="medicine_api_phone" class="block text-sm font-medium text-gray-700">Medicine API Phone</label>
-                                <input type="text" id="medicine_api_phone" name="medicine_api_phone" value="{{ old('medicine_api_phone', $settings['medicine_api_phone']) }}" required placeholder="08xxxxxxxxxx" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <label for="medicine_api_phone" class="form-label">Medicine API Phone</label>
+                                <div class="relative">
+                                    <input type="text"
+                                           id="medicine_api_phone"
+                                           name="medicine_api_phone"
+                                           value="{{ old('medicine_api_phone', $settings['medicine_api_phone']) }}"
+                                           required
+                                           class="form-input pl-10"
+                                           placeholder="08xxxxxxxxxx"
+                                           pattern="^08[0-9]{9,11}$">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-phone text-gray-400"></i>
+                                    </div>
+                                </div>
+                                @error('medicine_api_phone')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Session Lifetime -->
                             <div>
-                                <label for="session_lifetime" class="block text-sm font-medium text-gray-700">Session Lifetime (minutes)</label>
-                                <input type="number" id="session_lifetime" name="session_lifetime" value="{{ old('session_lifetime', $settings['session_lifetime']) }}" required min="1" max="525600" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <p class="mt-1 text-sm text-gray-500">Maximum: 525600 (1 year)</p>
+                                <label for="session_lifetime" class="form-label">Session Lifetime (minutes)</label>
+                                <div class="relative">
+                                    <input type="number"
+                                           id="session_lifetime"
+                                           name="session_lifetime"
+                                           value="{{ old('session_lifetime', $settings['session_lifetime']) }}"
+                                           required
+                                           min="1"
+                                           max="525600"
+                                           class="form-input pl-10">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-clock text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    Maximum: 525600 (1 year)
+                                </p>
+                                @error('session_lifetime')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Cache Status -->
-                            <div class="p-4 bg-gray-50 rounded-lg">
-                                <div class="text-sm font-medium text-gray-700">Cache Status</div>
-                                <div class="mt-1">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $settings['cache_enabled'] ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                        {{ $settings['cache_enabled'] ? 'Enabled' : 'Disabled' }}
-                                    </span>
+                            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                                    <i class="fas fa-database mr-2"></i>
+                                    Cache Status
                                 </div>
+                                <span class="badge {{ $settings['cache_enabled'] ? 'badge-medical' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
+                                    {{ $settings['cache_enabled'] ? 'Enabled' : 'Disabled' }}
+                                </span>
                             </div>
                         </div>
 
-                        <div class="flex justify-end pt-6">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <!-- Form Actions -->
+                        <div class="flex justify-end pt-8 border-t border-gray-200 dark:border-gray-700">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>
                                 Save Settings
                             </button>
                         </div>
@@ -137,39 +286,52 @@
             </div>
 
             <!-- System Information -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">System Information</h3>
+            <div class="card">
+                <div class="p-8">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+                        <i class="fas fa-info-circle mr-3 text-primary-500"></i>
+                        System Information
+                    </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">PHP Version</div>
-                            <div class="text-lg font-medium text-gray-900">{{ phpversion() }}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">PHP Version</div>
+                            <div class="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                {{ phpversion() }}
+                            </div>
                         </div>
 
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Laravel Version</div>
-                            <div class="text-lg font-medium text-gray-900">{{ app()->version() }}</div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Laravel Version</div>
+                            <div class="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                {{ app()->version() }}
+                            </div>
                         </div>
 
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Server Software</div>
-                            <div class="text-lg font-medium text-gray-900">{{ $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' }}</div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Server Software</div>
+                            <div class="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                {{ $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' }}
+                            </div>
                         </div>
 
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Database</div>
-                            <div class="text-lg font-medium text-gray-900">{{ config('database.default') }}</div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Database</div>
+                            <div class="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                {{ config('database.default') }}
+                            </div>
                         </div>
 
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Environment</div>
-                            <div class="text-lg font-medium text-gray-900">{{ app()->environment() }}</div>
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Environment</div>
+                            <div class="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                {{ app()->environment() }}
+                            </div>
                         </div>
 
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Debug Mode</div>
-                            <div class="text-lg font-medium {{ config('app.debug') ? 'text-red-600' : 'text-green-600' }}">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Debug Mode</div>
+                            <div class="text-lg font-medium {{ config('app.debug') ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }} mt-1">
                                 {{ config('app.debug') ? 'Enabled' : 'Disabled' }}
                             </div>
                         </div>

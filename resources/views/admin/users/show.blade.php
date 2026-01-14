@@ -1,74 +1,108 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('User Details') }}
-            </h2>
-            <div class="flex space-x-2">
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('User Details') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    View user information and activities
+                </p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-medical">
+                    <i class="fas fa-edit mr-2"></i>
                     Edit
                 </a>
-                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400">
-                    Back
+                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Users
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- User Info Card -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                        <div class="flex items-center mb-4 md:mb-0">
-                            <div class="flex-shrink-0 h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center text-xl font-bold text-gray-700">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- User Profile Card -->
+            <div class="card mb-8">
+                <div class="p-8">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                        <!-- User Info -->
+                        <div class="flex items-center mb-6 lg:mb-0">
+                            <div class="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center text-3xl font-bold text-white">
                                 {{ substr($user->name, 0, 1) }}
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h3>
-                                <div class="flex items-center mt-1">
-                                    <span class="px-3 py-1 text-sm font-semibold rounded-full {{ $user->role_badge }}">
+                            <div class="ml-6">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h3>
+                                <div class="flex items-center mt-2 space-x-4">
+                                    <span class="badge {{ $user->role == 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : ($user->role == 'doctor' ? 'badge-primary' : 'badge-medical') }}">
                                         {{ $user->formatted_role }}
                                     </span>
-                                    <span class="ml-3 text-sm text-gray-500">Member since {{ $user->created_at->format('d M Y') }}</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Member since {{ $user->created_at->format('d M Y') }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="text-right">
-                            <div class="text-sm text-gray-500">Last Login</div>
-                            <div class="text-lg font-semibold text-gray-900">
+                        <!-- Last Login -->
+                        <div class="lg:text-right">
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Last Login</div>
+                            <div class="text-lg font-semibold text-gray-900 dark:text-white">
                                 {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never' }}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Contact Info -->
-                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Email Address</div>
-                            <div class="text-lg font-medium text-gray-900">{{ $user->email }}</div>
+                    <!-- Contact Information -->
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-envelope text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Email Address</div>
+                                    <div class="text-lg font-medium text-gray-900 dark:text-white">{{ $user->email }}</div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                Verified: {{ $user->email_verified_at ? $user->email_verified_at->format('d M Y') : 'Not Verified' }}
+                            </div>
                         </div>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <div class="text-sm text-gray-500">Phone Number</div>
-                            <div class="text-lg font-medium text-gray-900">{{ $user->phone }}</div>
+
+                        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-phone text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">Phone Number</div>
+                                    <div class="text-lg font-medium text-gray-900 dark:text-white">{{ $user->phone }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats -->
+            <!-- Statistics -->
             @if(!empty($stats))
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 @foreach($stats as $key => $value)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <div class="text-sm text-gray-500 capitalize">{{ str_replace('_', ' ', $key) }}</div>
+                        <div class="text-sm font-medium text-gray-600 dark:text-gray-400 capitalize mb-2">
+                            {{ str_replace('_', ' ', $key) }}
+                        </div>
                         @if(strpos($key, 'revenue') !== false)
-                        <div class="text-2xl font-bold text-green-600">IDR {{ number_format($value, 0, ',', '.') }}</div>
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                            IDR {{ number_format($value, 0, ',', '.') }}
+                        </div>
                         @else
-                        <div class="text-2xl font-bold text-gray-900">{{ $value }}</div>
+                        <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $value }}</div>
                         @endif
                     </div>
                 </div>
@@ -76,116 +110,117 @@
             </div>
             @endif
 
-            <!-- Recent Activities -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Recent Examinations (for Doctors) -->
-                @if($user->isDoctor() && $user->examinations->count() > 0)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <!-- User Activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Recent Activities -->
+                @if($user->auditLogs->count() > 0)
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Recent Examinations</h4>
-                        <div class="space-y-3">
-                            @foreach($user->examinations as $examination)
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <div class="flex justify-between">
-                                    <div class="font-medium text-gray-900">{{ $examination->patient->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $examination->created_at->diffForHumans() }}</div>
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+                            <i class="fas fa-history mr-3 text-primary-500"></i>
+                            Recent Activities
+                        </h4>
+                        <div class="space-y-4">
+                            @foreach($user->auditLogs->take(5) as $log)
+                            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        @php
+                                            $actionColors = [
+                                                'CREATE' => ['bg' => 'bg-green-100 dark:bg-green-900/30', 'text' => 'text-green-800 dark:text-green-200', 'icon' => 'fa-plus-circle'],
+                                                'UPDATE' => ['bg' => 'bg-blue-100 dark:bg-blue-900/30', 'text' => 'text-blue-800 dark:text-blue-200', 'icon' => 'fa-edit'],
+                                                'DELETE' => ['bg' => 'bg-red-100 dark:bg-red-900/30', 'text' => 'text-red-800 dark:text-red-200', 'icon' => 'fa-trash-alt'],
+                                            ];
+                                            $color = $actionColors[$log->action] ?? ['bg' => 'bg-gray-100 dark:bg-gray-700', 'text' => 'text-gray-800 dark:text-gray-200', 'icon' => 'fa-circle'];
+                                        @endphp
+                                        <span class="badge {{ $color['bg'] }} {{ $color['text'] }} text-xs">
+                                            <i class="fas {{ $color['icon'] }} mr-1"></i>
+                                            {{ $log->action }}
+                                        </span>
+                                        <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $log->table_name }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $log->created_at->diffForHumans() }}
+                                    </div>
                                 </div>
-                                <div class="text-sm text-gray-600 mt-1">{{ Str::limit($examination->doctor_notes, 100) }}</div>
+                                @if($log->description)
+                                <div class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                    {{ $log->description }}
+                                </div>
+                                @endif
                             </div>
                             @endforeach
                         </div>
+                        @if($user->auditLogs->count() > 5)
+                        <div class="mt-6 text-center">
+                            <a href="#" class="text-primary-600 dark:text-primary-400 hover:underline text-sm">
+                                View all activities →
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 @endif
 
-                <!-- Recent Processed Prescriptions (for Pharmacists) -->
-                @if($user->isPharmacist() && $user->processedPrescriptions->count() > 0)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Recent Examinations or Prescriptions -->
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Recent Processed Prescriptions</h4>
-                        <div class="space-y-3">
-                            @foreach($user->processedPrescriptions as $prescription)
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <div class="flex justify-between">
-                                    <div class="font-medium text-gray-900">Prescription #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}</div>
-                                    <div class="text-sm text-gray-500">{{ $prescription->created_at->diffForHumans() }}</div>
-                                </div>
-                                <div class="text-sm text-gray-600 mt-1">
-                                    Patient: {{ $prescription->examination->patient->name }}
-                                    <span class="ml-3">Total: {{ $prescription->formatted_total_price }}</span>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                @endif
-            </div>
-
-            <!-- Audit Logs -->
-            @if($user->auditLogs->count() > 0)
-            <div class="mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h4>
-                    <div class="space-y-3">
-                        @foreach($user->auditLogs as $log)
-                        <div class="p-3 border border-gray-200 rounded-lg">
-                            <div class="flex justify-between">
-                                <div>
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
-                                        {{ $log->action == 'CREATE' ? 'bg-green-100 text-green-800' :
-                                        ($log->action == 'UPDATE' ? 'bg-blue-100 text-blue-800' :
-                                        ($log->action == 'DELETE' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
-                                        {{ $log->action }}
-                                    </span>
-                                    <span class="ml-2 text-sm font-medium text-gray-900">{{ $log->table_name }}</span>
-                                </div>
-                                <div class="text-sm text-gray-500">{{ $log->created_at->diffForHumans() }}</div>
-                            </div>
-
-                            @if(!empty($log->old_values) || !empty($log->new_values))
-                            <div class="text-xs text-gray-600 mt-2 space-y-1">
-                                @if(!empty($log->old_values))
-                                    @php
-                                        $oldValues = is_string($log->old_values) ? json_decode($log->old_values, true) : $log->old_values;
-                                    @endphp
-                                    @if(is_array($oldValues) && !empty($oldValues))
-                                    <div class="bg-red-50 p-2 rounded">
-                                        <strong class="text-red-700">Before:</strong>
-                                        @foreach($oldValues as $key => $value)
-                                            <div>{{ $key }}: {{ is_array($value) ? json_encode($value) : $value }}</div>
-                                        @endforeach
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+                            <i class="fas fa-clipboard-list mr-3 text-medical-500"></i>
+                            Recent {{ $user->isDoctor() ? 'Examinations' : 'Prescriptions' }}
+                        </h4>
+                        @if($user->isDoctor() && $user->examinations->count() > 0)
+                            <div class="space-y-4">
+                                @foreach($user->examinations->take(3) as $examination)
+                                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-medium text-gray-900 dark:text-white">
+                                                {{ $examination->patient->name }}
+                                            </div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                {{ Str::limit($examination->doctor_notes, 80) }}
+                                            </div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $examination->created_at->format('d M') }}
+                                        </div>
                                     </div>
-                                    @endif
-                                @endif
-
-                                @if(!empty($log->new_values))
-                                    @php
-                                        $newValues = is_string($log->new_values) ? json_decode($log->new_values, true) : $log->new_values;
-                                    @endphp
-                                    @if(is_array($newValues) && !empty($newValues))
-                                    <div class="bg-green-50 p-2 rounded">
-                                        <strong class="text-green-700">After:</strong>
-                                        @foreach($newValues as $key => $value)
-                                            <div>{{ $key }}: {{ is_array($value) ? json_encode($value) : $value }}</div>
-                                        @endforeach
+                                </div>
+                                @endforeach
+                            </div>
+                        @elseif($user->isPharmacist() && $user->processedPrescriptions->count() > 0)
+                            <div class="space-y-4">
+                                @foreach($user->processedPrescriptions->take(3) as $prescription)
+                                <div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <div class="font-medium text-gray-900 dark:text-white">
+                                                Prescription #{{ str_pad($prescription->id, 6, '0', STR_PAD_LEFT) }}
+                                            </div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                Patient: {{ $prescription->examination->patient->name }}
+                                                <span class="ml-3">Total: {{ $prescription->formatted_total_price }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $prescription->created_at->format('d M') }}
+                                        </div>
                                     </div>
-                                    @endif
-                                @endif
+                                </div>
+                                @endforeach
                             </div>
-                            @endif
-
-                            @if($log->description)
-                            <div class="text-xs text-gray-500 mt-2">
-                                <strong>Description:</strong> {{ $log->description }}
+                        @else
+                            <div class="text-center py-8">
+                                <i class="fas fa-file-alt text-gray-300 dark:text-gray-600 text-4xl mb-3"></i>
+                                <p class="text-gray-700 dark:text-gray-300">No {{ $user->isDoctor() ? 'examinations' : 'prescriptions' }} found</p>
                             </div>
-                            @endif
-                        </div>
-                        @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
-            @endif
         </div>
     </div>
 </x-app-layout>

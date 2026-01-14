@@ -1,63 +1,96 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Audit Logs') }}
-            </h2>
-            <form action="{{ route('admin.audit-logs.clear') }}" method="POST" onsubmit="return confirm('Clear all logs older than 30 days?');">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Audit Logs') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    System activity logs and audit trail
+                </p>
+            </div>
+            <form action="{{ route('admin.audit-logs.clear') }}" method="POST"
+                  onsubmit="return confirm('Clear all logs older than 30 days?');">
                 @csrf
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <button type="submit" class="btn bg-red-600 hover:bg-red-700 text-white">
+                    <i class="fas fa-trash-alt mr-2"></i>
                     Clear Old Logs
                 </button>
             </form>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Filters -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card mb-8">
                 <div class="p-6">
-                    <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- Search -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Search</label>
-                            <input type="text" name="search" value="{{ $search }}" placeholder="Table, user, or action" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Action</label>
-                            <select name="action" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">All Actions</option>
-                                @foreach($actions as $action)
-                                <option value="{{ $action }}" {{ $action == $action ? 'selected' : '' }}>{{ $action }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Table</label>
-                            <select name="table" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">All Tables</option>
-                                @foreach($tableNames as $tableName)
-                                <option value="{{ $tableName }}" {{ $tableName == $table ? 'selected' : '' }}>{{ $tableName }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Date Range</label>
-                            <div class="flex space-x-2">
-                                <input type="date" name="date_from" value="{{ $dateFrom }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <input type="date" name="date_to" value="{{ $dateTo }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <label class="form-label">Search</label>
+                            <div class="relative">
+                                <input type="text"
+                                       name="search"
+                                       value="{{ $search }}"
+                                       placeholder="Table, user, or action"
+                                       class="form-input pl-10">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="md:col-span-4 flex items-end space-x-2">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                Filter
+                        <!-- Action Filter -->
+                        <div>
+                            <label class="form-label">Action</label>
+                            <select name="action" class="form-input">
+                                <option value="">All Actions</option>
+                                @foreach($actions as $action)
+                                <option value="{{ $action }}" {{ $selectedAction == $action ? 'selected' : '' }}>
+                                    {{ $action }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Table Filter -->
+                        <div>
+                            <label class="form-label">Table</label>
+                            <select name="table" class="form-input">
+                                <option value="">All Tables</option>
+                                @foreach($tableNames as $tableName)
+                                <option value="{{ $tableName }}" {{ $selectedTable == $tableName ? 'selected' : '' }}>
+                                    {{ $tableName }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div>
+                            <label class="form-label">Date Range</label>
+                            <div class="flex space-x-3">
+                                <input type="date"
+                                       name="date_from"
+                                       value="{{ $dateFrom }}"
+                                       class="form-input flex-1">
+                                <input type="date"
+                                       name="date_to"
+                                       value="{{ $dateTo }}"
+                                       class="form-input flex-1">
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="md:col-span-4 flex items-end space-x-3">
+                            <button type="submit" class="btn btn-primary flex-1">
+                                <i class="fas fa-filter mr-2"></i>
+                                Apply Filters
                             </button>
-                            <a href="{{ route('admin.audit-logs.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                Clear
+                            <a href="{{ route('admin.audit-logs.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times mr-2"></i>
+                                Clear All
                             </a>
                         </div>
                     </form>
@@ -65,155 +98,253 @@
             </div>
 
             <!-- Logs Table -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Time
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        User
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Action
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Table
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Details
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        IP Address
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse ($logs as $log)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $log->created_at->format('d M Y') }}</div>
-                                            <div class="text-xs text-gray-500">{{ $log->created_at->format('H:i:s') }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($log->user)
-                                            <div class="flex items-center">
-                                                <div class="text-sm font-medium text-gray-900">{{ $log->user->name }}</div>
-                                                <div class="ml-2 px-2 py-1 text-xs font-semibold rounded-full {{ $log->user->role_badge }}">
-                                                    {{ $log->user->formatted_role }}
+                    @if($logs->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Time
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            User
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Action
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Table
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Details
+                                        </th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            IP Address
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    @foreach ($logs as $log)
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <!-- Time Column -->
+                                            <td class="px-4 py-4">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                    {{ $log->created_at->format('d M Y') }}
                                                 </div>
-                                            </div>
-                                            <div class="text-xs text-gray-500">{{ $log->user->email }}</div>
-                                            @else
-                                            <div class="text-sm text-gray-500">System</div>
-                                            @endif
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                                {{ $log->action == 'CREATE' ? 'bg-green-100 text-green-800' :
-                                                ($log->action == 'UPDATE' ? 'bg-blue-100 text-blue-800' :
-                                                ($log->action == 'DELETE' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')) }}">
-                                                {{ $log->action }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{ $log->table_name }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900">
-                                                @if($log->action == 'UPDATE')
-                                                    @php
-                                                        // Cek apakah values sudah array atau masih string JSON
-                                                        $oldValues = $log->old_values;
-                                                        $newValues = $log->new_values;
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $log->created_at->format('H:i:s') }}
+                                                </div>
+                                            </td>
 
-                                                        // Jika masih string, decode
-                                                        if (is_string($oldValues)) {
-                                                            $oldValues = json_decode($oldValues, true);
-                                                        }
-                                                        if (is_string($newValues)) {
-                                                            $newValues = json_decode($newValues, true);
-                                                        }
+                                            <!-- User Column -->
+                                            <td class="px-4 py-4">
+                                                @if($log->user)
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3">
+                                                        <span class="text-gray-600 dark:text-gray-400 font-medium">
+                                                            {{ substr($log->user->name, 0, 1) }}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                            {{ $log->user->name }}
+                                                        </div>
+                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $log->user->email }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @else
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">System</div>
+                                                @endif
+                                            </td>
 
-                                                        // Cari perubahan
-                                                        $changes = [];
-                                                        if (is_array($oldValues) && is_array($newValues)) {
-                                                            $changes = array_keys(array_diff_assoc($newValues, $oldValues));
-                                                        } elseif (is_array($newValues)) {
-                                                            $changes = array_keys($newValues);
-                                                        }
-                                                    @endphp
+                                            <!-- Action Column -->
+                                            <td class="px-4 py-4">
+                                                @php
+                                                    $actionColors = [
+                                                        'CREATE' => ['bg' => 'bg-green-100 dark:bg-green-900/30', 'text' => 'text-green-800 dark:text-green-200', 'icon' => 'fa-plus-circle'],
+                                                        'UPDATE' => ['bg' => 'bg-blue-100 dark:bg-blue-900/30', 'text' => 'text-blue-800 dark:text-blue-200', 'icon' => 'fa-edit'],
+                                                        'DELETE' => ['bg' => 'bg-red-100 dark:bg-red-900/30', 'text' => 'text-red-800 dark:text-red-200', 'icon' => 'fa-trash-alt'],
+                                                        'LOGIN' => ['bg' => 'bg-purple-100 dark:bg-purple-900/30', 'text' => 'text-purple-800 dark:text-purple-200', 'icon' => 'fa-sign-in-alt'],
+                                                        'LOGOUT' => ['bg' => 'bg-gray-100 dark:bg-gray-700', 'text' => 'text-gray-800 dark:text-gray-200', 'icon' => 'fa-sign-out-alt'],
+                                                    ];
+                                                    $color = $actionColors[$log->action] ?? ['bg' => 'bg-gray-100 dark:bg-gray-700', 'text' => 'text-gray-800 dark:text-gray-200', 'icon' => 'fa-circle'];
+                                                @endphp
+                                                <div class="flex items-center">
+                                                    <span class="badge {{ $color['bg'] }} {{ $color['text'] }}">
+                                                        <i class="fas {{ $color['icon'] }} mr-2"></i>
+                                                        {{ $log->action }}
+                                                    </span>
+                                                </div>
+                                            </td>
 
-                                                    @if(!empty($changes))
-                                                        <span class="text-gray-600">Updated:</span>
-                                                        {{ implode(', ', array_slice($changes, 0, 3)) }}
-                                                        @if(count($changes) > 3)
-                                                            <span class="text-gray-500">+{{ count($changes) - 3 }} more</span>
-                                                        @endif
-                                                    @else
-                                                        <span class="text-gray-500">Updated (no field changes detected)</span>
-                                                    @endif
+                                            <!-- Table Column -->
+                                            <td class="px-4 py-4">
+                                                <div class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $log->table_name }}
+                                                </div>
+                                            </td>
 
-                                                @elseif($log->action == 'CREATE')
-                                                    <span class="text-green-600">Created new record</span>
-                                                    @if($log->new_values && is_array($log->new_values))
-                                                        @php
-                                                            $newValues = $log->new_values;
-                                                            if (is_string($newValues)) {
-                                                                $newValues = json_decode($newValues, true);
-                                                            }
-                                                            $fields = array_keys(array_slice($newValues, 0, 2));
-                                                        @endphp
-                                                        @if(!empty($fields))
-                                                            <div class="text-xs text-gray-500 mt-1">
-                                                                Fields: {{ implode(', ', $fields) }}
-                                                            </div>
-                                                        @endif
-                                                    @endif
-
-                                                @elseif($log->action == 'DELETE')
-                                                    <span class="text-red-600">Deleted record</span>
-                                                    @if($log->old_values && is_array($log->old_values))
+                                            <!-- Details Column -->
+                                            <td class="px-4 py-4">
+                                                <div class="text-sm text-gray-900 dark:text-white">
+                                                    @if($log->action == 'UPDATE')
                                                         @php
                                                             $oldValues = $log->old_values;
+                                                            $newValues = $log->new_values;
+
                                                             if (is_string($oldValues)) {
                                                                 $oldValues = json_decode($oldValues, true);
                                                             }
-                                                            $fields = array_keys(array_slice($oldValues, 0, 2));
+                                                            if (is_string($newValues)) {
+                                                                $newValues = json_decode($newValues, true);
+                                                            }
+
+                                                            $changes = [];
+                                                            if (is_array($oldValues) && is_array($newValues)) {
+                                                                $changes = array_keys(array_diff_assoc($newValues, $oldValues));
+                                                            } elseif (is_array($newValues)) {
+                                                                $changes = array_keys($newValues);
+                                                            }
                                                         @endphp
-                                                        @if(!empty($fields))
-                                                            <div class="text-xs text-gray-500 mt-1">
-                                                                Contained: {{ implode(', ', $fields) }}
+
+                                                        @if(!empty($changes))
+                                                            <div class="text-gray-600 dark:text-gray-400">
+                                                                <i class="fas fa-edit mr-1"></i>
+                                                                Updated {{ count($changes) }} field(s)
                                                             </div>
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                {{ implode(', ', array_slice($changes, 0, 2)) }}
+                                                                @if(count($changes) > 2)
+                                                                    <span class="text-gray-400">+{{ count($changes) - 2 }} more</span>
+                                                                @endif
+                                                            </div>
+                                                        @else
+                                                            <span class="text-gray-500 dark:text-gray-400">
+                                                                <i class="fas fa-info-circle mr-1"></i>
+                                                                Updated (no field changes)
+                                                            </span>
                                                         @endif
+
+                                                    @elseif($log->action == 'CREATE')
+                                                        <div class="text-green-600 dark:text-green-400">
+                                                            <i class="fas fa-plus-circle mr-1"></i>
+                                                            Created new record
+                                                        </div>
+                                                        @if($log->new_values)
+                                                            @php
+                                                                $newData = $log->new_values;
+                                                                if (is_string($newData)) {
+                                                                    $newData = json_decode($newData, true);
+                                                                }
+                                                            @endphp
+                                                            @if(is_array($newData) && !empty($newData))
+                                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                                {{ Str::limit(json_encode(array_slice($newData, 0, 2)), 50) }}
+                                                            </div>
+                                                            @endif
+                                                        @endif
+
+                                                    @elseif($log->action == 'DELETE')
+                                                        <div class="text-red-600 dark:text-red-400">
+                                                            <i class="fas fa-trash-alt mr-1"></i>
+                                                            Deleted record
+                                                        </div>
+
+                                                    @else
+                                                        <span class="text-gray-600 dark:text-gray-400">
+                                                            {{ $log->description ?? 'Action performed' }}
+                                                        </span>
                                                     @endif
+                                                </div>
+                                            </td>
 
-                                                @else
-                                                    <span class="text-gray-600">{{ $log->description ?? 'Action performed' }}</span>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $log->ip_address }}
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                            No audit logs found.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                            <!-- IP Address Column -->
+                                            <td class="px-4 py-4">
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ $log->ip_address }}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        @if($logs->hasPages())
+                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-700 dark:text-gray-300">
+                                    Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} log entries
+                                </div>
+                                <div class="flex space-x-2">
+                                    {{ $logs->links() }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    @else
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-history text-gray-400 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No audit logs found</h3>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                @if($search || $selectedAction || $selectedTable || $dateFrom || $dateTo)
+                                    No logs match your filter criteria.
+                                @else
+                                    There are no audit logs in the system yet.
+                                @endif
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div class="card">
+                    <div class="p-6 text-center">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                            {{ $totalLogs }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Total Logs</div>
                     </div>
-
-                    <!-- Pagination -->
-                    <div class="mt-4">
-                        {{ $logs->links() }}
+                </div>
+                <div class="card">
+                    <div class="p-6 text-center">
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">
+                            {{ $logs->where('action', 'CREATE')->count() }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Create Actions</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="p-6 text-center">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                            {{ $logs->where('action', 'UPDATE')->count() }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Update Actions</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="p-6 text-center">
+                        <div class="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">
+                            {{ $logs->where('action', 'DELETE')->count() }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Delete Actions</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="p-6 text-center">
+                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                            {{ $logs->whereIn('action', ['LOGIN', 'LOGOUT'])->count() }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Auth Actions</div>
                     </div>
                 </div>
             </div>

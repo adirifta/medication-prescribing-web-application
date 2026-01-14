@@ -1,33 +1,48 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Edit Examination') }}
-            </h2>
-            <div class="text-sm text-gray-500">
-                <a href="{{ route('doctor.examinations.show', $examination->id) }}" class="text-blue-600 hover:text-blue-800">
-                    ← Back to Examination
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Edit Examination
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Update examination details for patient
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
+                </button>
+                <a href="{{ route('doctor.examinations.show', $examination->id) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Examination
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="card">
+                <div class="p-6">
                     <form id="examinationForm" action="{{ route('doctor.examinations.update', $examination->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                         @csrf
                         @method('PUT')
 
                         <!-- Patient Information -->
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-blue-800 mb-4">Patient Information</h3>
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-4 flex items-center">
+                                <i class="fas fa-user-injured mr-3"></i>
+                                Patient Information
+                            </h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="patient_id" class="block text-sm font-medium text-gray-700">Patient</label>
-                                    <select id="patient_id" name="patient_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <label for="patient_id" class="form-label">
+                                        <i class="fas fa-user mr-2 text-blue-500"></i>
+                                        Select Patient
+                                    </label>
+                                    <select id="patient_id" name="patient_id" required class="form-input">
                                         <option value="">Select a patient</option>
                                         @foreach($patients as $p)
                                             <option value="{{ $p->id }}" {{ $examination->patient_id == $p->id ? 'selected' : '' }}>
@@ -37,12 +52,14 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-end">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Current Patient</label>
-                                        <div class="mt-2 text-sm font-medium text-gray-900">
+                                <div class="flex items-center">
+                                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-200 dark:border-blue-700 flex-1">
+                                        <div class="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">Current Patient</div>
+                                        <div class="text-lg font-semibold text-gray-900 dark:text-white">
                                             {{ $examination->patient->name }}
-                                            <span class="text-gray-500 ml-2">(MRN: {{ $examination->patient->medical_record_number }})</span>
+                                        </div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                                            MRN: {{ $examination->patient->medical_record_number }}
                                         </div>
                                     </div>
                                 </div>
@@ -50,125 +67,222 @@
                         </div>
 
                         <!-- Vital Signs -->
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-green-800 mb-4">Vital Signs</h3>
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-green-800 dark:text-green-300 mb-4 flex items-center">
+                                <i class="fas fa-heart-pulse mr-3"></i>
+                                Vital Signs
+                            </h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Height -->
                                 <div>
-                                    <label for="height" class="block text-sm font-medium text-gray-700">Height (cm)</label>
-                                    <input type="number" step="0.1" id="height" name="height" value="{{ old('height', $examination->height) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="height" class="form-label">
+                                        <i class="fas fa-ruler-vertical mr-2 text-green-500"></i>
+                                        Height (cm)
+                                    </label>
+                                    <input type="number" step="0.1" id="height" name="height"
+                                           value="{{ old('height', $examination->height) }}"
+                                           class="form-input"
+                                           oninput="calculateBMI()">
                                 </div>
 
+                                <!-- Weight -->
                                 <div>
-                                    <label for="weight" class="block text-sm font-medium text-gray-700">Weight (kg)</label>
-                                    <input type="number" step="0.1" id="weight" name="weight" value="{{ old('weight', $examination->weight) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="weight" class="form-label">
+                                        <i class="fas fa-weight-scale mr-2 text-green-500"></i>
+                                        Weight (kg)
+                                    </label>
+                                    <input type="number" step="0.1" id="weight" name="weight"
+                                           value="{{ old('weight', $examination->weight) }}"
+                                           class="form-input"
+                                           oninput="calculateBMI()">
                                 </div>
 
+                                <!-- BMI -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">BMI</label>
-                                    <div id="bmi-display" class="mt-2 text-lg font-semibold text-gray-900">{{ $examination->bmi ?: '-' }}</div>
+                                    <label class="form-label">
+                                        <i class="fas fa-chart-line mr-2 text-green-500"></i>
+                                        BMI
+                                    </label>
+                                    <div class="flex items-center mt-1">
+                                        <div id="bmi-display" class="text-2xl font-bold text-gray-900 dark:text-white mr-3">
+                                            {{ $examination->bmi ?: '-' }}
+                                        </div>
+                                        <div id="bmi-indicator" class="text-xs font-semibold px-2 py-1 rounded-full">
+                                            <!-- Will be populated by JavaScript -->
+                                        </div>
+                                    </div>
                                     <input type="hidden" id="bmi" name="bmi" value="{{ old('bmi', $examination->bmi) }}">
                                 </div>
 
+                                <!-- Systolic -->
                                 <div>
-                                    <label for="systolic" class="block text-sm font-medium text-gray-700">Systolic (mmHg)</label>
-                                    <input type="number" id="systolic" name="systolic" value="{{ old('systolic', $examination->systolic) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="systolic" class="form-label">
+                                        <i class="fas fa-tachometer-alt mr-2 text-red-500"></i>
+                                        Systolic (mmHg)
+                                    </label>
+                                    <input type="number" id="systolic" name="systolic"
+                                           value="{{ old('systolic', $examination->systolic) }}"
+                                           class="form-input"
+                                           oninput="updateBP()">
                                 </div>
 
+                                <!-- Diastolic -->
                                 <div>
-                                    <label for="diastolic" class="block text-sm font-medium text-gray-700">Diastolic (mmHg)</label>
-                                    <input type="number" id="diastolic" name="diastolic" value="{{ old('diastolic', $examination->diastolic) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="diastolic" class="form-label">
+                                        <i class="fas fa-tachometer-alt mr-2 text-red-500"></i>
+                                        Diastolic (mmHg)
+                                    </label>
+                                    <input type="number" id="diastolic" name="diastolic"
+                                           value="{{ old('diastolic', $examination->diastolic) }}"
+                                           class="form-input"
+                                           oninput="updateBP()">
                                 </div>
 
+                                <!-- Blood Pressure -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Blood Pressure</label>
-                                    <div id="bp-display" class="mt-2 text-sm text-gray-900">{{ $examination->blood_pressure ?: '-' }}</div>
+                                    <label class="form-label">
+                                        <i class="fas fa-heart mr-2 text-red-500"></i>
+                                        Blood Pressure
+                                    </label>
+                                    <div id="bp-display" class="text-xl font-semibold text-gray-900 dark:text-white mt-1">
+                                        {{ $examination->blood_pressure ?: '-' }}
+                                    </div>
                                 </div>
 
+                                <!-- Heart Rate -->
                                 <div>
-                                    <label for="heart_rate" class="block text-sm font-medium text-gray-700">Heart Rate (bpm)</label>
-                                    <input type="number" id="heart_rate" name="heart_rate" value="{{ old('heart_rate', $examination->heart_rate) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="heart_rate" class="form-label">
+                                        <i class="fas fa-heartbeat mr-2 text-pink-500"></i>
+                                        Heart Rate (bpm)
+                                    </label>
+                                    <input type="number" id="heart_rate" name="heart_rate"
+                                           value="{{ old('heart_rate', $examination->heart_rate) }}"
+                                           class="form-input">
                                 </div>
 
+                                <!-- Respiration Rate -->
                                 <div>
-                                    <label for="respiration_rate" class="block text-sm font-medium text-gray-700">Respiration Rate</label>
-                                    <input type="number" id="respiration_rate" name="respiration_rate" value="{{ old('respiration_rate', $examination->respiration_rate) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="respiration_rate" class="form-label">
+                                        <i class="fas fa-lungs mr-2 text-teal-500"></i>
+                                        Respiration Rate
+                                    </label>
+                                    <input type="number" id="respiration_rate" name="respiration_rate"
+                                           value="{{ old('respiration_rate', $examination->respiration_rate) }}"
+                                           class="form-input">
                                 </div>
 
+                                <!-- Temperature -->
                                 <div>
-                                    <label for="temperature" class="block text-sm font-medium text-gray-700">Temperature (°C)</label>
-                                    <input type="number" step="0.1" id="temperature" name="temperature" value="{{ old('temperature', $examination->temperature) }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
+                                    <label for="temperature" class="form-label">
+                                        <i class="fas fa-thermometer-half mr-2 text-orange-500"></i>
+                                        Temperature (°C)
+                                    </label>
+                                    <input type="number" step="0.1" id="temperature" name="temperature"
+                                           value="{{ old('temperature', $examination->temperature) }}"
+                                           class="form-input">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Doctor Notes -->
                         <div>
-                            <label for="doctor_notes" class="block text-sm font-medium text-gray-700">Doctor Notes</label>
-                            <textarea id="doctor_notes" name="doctor_notes" rows="4" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('doctor_notes', $examination->doctor_notes) }}</textarea>
+                            <label for="doctor_notes" class="form-label flex items-center">
+                                <i class="fas fa-stethoscope mr-2 text-blue-500"></i>
+                                Doctor Notes
+                            </label>
+                            <textarea id="doctor_notes" name="doctor_notes" rows="4" required
+                                      class="form-input">{{ old('doctor_notes', $examination->doctor_notes) }}</textarea>
                         </div>
 
                         <!-- File Upload -->
                         <div>
-                            <label for="external_file" class="block text-sm font-medium text-gray-700">Upload External File</label>
+                            <label class="form-label flex items-center">
+                                <i class="fas fa-paperclip mr-2 text-gray-500"></i>
+                                External Files
+                            </label>
                             @if($examination->external_file_path)
-                            <div class="mb-2 p-3 bg-gray-50 rounded-lg">
+                            <div class="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                                 <div class="flex items-center">
-                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <div class="ml-3">
-                                        <div class="text-sm font-medium text-gray-900">Current File</div>
-                                        <a href="{{ Storage::url($examination->external_file_path) }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800">
-                                            View File
-                                        </a>
+                                    <i class="fas fa-file-medical text-gray-400 text-xl mr-3"></i>
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900 dark:text-white">Current File</div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                                            Uploaded on {{ $examination->created_at->format('d M Y') }}
+                                        </div>
                                     </div>
+                                    <a href="{{ Storage::url($examination->external_file_path) }}" target="_blank"
+                                       class="btn btn-secondary text-sm px-3 py-1">
+                                        <i class="fas fa-eye mr-1"></i> View
+                                    </a>
                                 </div>
                             </div>
                             @endif
-                            <input type="file" id="external_file" name="external_file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            <p class="mt-1 text-xs text-gray-500">PDF, JPG, PNG, DOC up to 10MB</p>
+                            <input type="file" id="external_file" name="external_file"
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                   class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300">
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Supported formats: PDF, JPG, PNG, DOC, DOCX (max 10MB)
+                            </p>
                         </div>
 
                         <!-- Prescription Section -->
                         @php
                             $examination->load(['prescription.items']);
                         @endphp
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-purple-800 mb-4">Prescription</h3>
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-purple-800 dark:text-purple-300 mb-4 flex items-center">
+                                <i class="fas fa-prescription-bottle-alt mr-3"></i>
+                                Prescription
+                            </h3>
 
                             @if($examination->prescription && !$examination->prescription->canBeEdited())
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                            <!-- Warning Message -->
+                            <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                                 <div class="flex">
-                                    <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-yellow-800">Prescription Status: {{ ucfirst($examination->prescription->status) }}</h3>
-                                        <div class="mt-2 text-sm text-yellow-700">
-                                            <p>This prescription has been processed by the pharmacist and cannot be edited.</p>
-                                        </div>
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                                    <div>
+                                        <h4 class="font-medium text-yellow-800 dark:text-yellow-200">
+                                            Prescription Status: {{ ucfirst($examination->prescription->status) }}
+                                        </h4>
+                                        <p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+                                            This prescription has been processed by the pharmacist and cannot be edited.
+                                            Contact the pharmacy if changes are needed.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             @endif
 
-                            <div class="mb-4">
-                                <label for="prescription_notes" class="block text-sm font-medium text-gray-700">Prescription Notes</label>
-                                <textarea id="prescription_notes" name="prescription_notes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500" {{ $examination->prescription && !$examination->prescription->canBeEdited() ? 'disabled' : '' }}>{{ old('prescription_notes', $examination->prescription->notes ?? '') }}</textarea>
+                            <!-- Prescription Notes -->
+                            <div class="mb-6">
+                                <label for="prescription_notes" class="form-label">
+                                    <i class="fas fa-notes-medical mr-2 text-purple-500"></i>
+                                    Prescription Notes
+                                </label>
+                                <textarea id="prescription_notes" name="prescription_notes" rows="2"
+                                          class="form-input"
+                                          {{ $examination->prescription && !$examination->prescription->canBeEdited() ? 'disabled' : '' }}>
+                                    {{ old('prescription_notes', $examination->prescription->notes ?? '') }}
+                                </textarea>
                             </div>
 
                             <!-- Medicine Selection -->
                             @if($examination->prescription && $examination->prescription->canBeEdited())
                             <div class="mb-6">
-                                <div class="flex justify-between items-center mb-2">
-                                    <label class="block text-sm font-medium text-gray-700">Medicines</label>
-                                    <button type="button" onclick="addMedicine()" class="inline-flex items-center px-3 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700">
-                                        + Add Medicine
+                                <div class="flex justify-between items-center mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-pills mr-2 text-purple-500"></i>
+                                        Medicines
+                                    </label>
+                                    <button type="button" onclick="addMedicine()" class="btn btn-secondary">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Add Medicine
                                     </button>
                                 </div>
 
-                                <div id="medicines-container" class="space-y-3">
+                                <div id="medicines-container" class="space-y-4">
                                     @php
                                         $medicineCounter = 0;
                                         $selectedMedicines = $examination->prescription->items ?? [];
@@ -177,56 +291,83 @@
                                     @if(count($selectedMedicines) > 0)
                                         @foreach($selectedMedicines as $index => $item)
                                             @php $medicineCounter = $index + 1; @endphp
-                                            <div id="medicine-{{ $medicineCounter }}" class="border border-gray-300 rounded-lg p-4 bg-white">
-                                                <div class="flex justify-between mb-2">
-                                                    <h4 class="font-medium">Medicine {{ $medicineCounter }}</h4>
-                                                    <button type="button" onclick="removeMedicine('medicine-{{ $medicineCounter }}')" class="text-red-600 hover:text-red-800">
-                                                        × Remove
+                                            <div id="medicine-{{ $medicineCounter }}" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                                                <div class="flex justify-between items-center mb-4">
+                                                    <h4 class="font-medium text-gray-900 dark:text-white flex items-center">
+                                                        <i class="fas fa-medkit mr-2 text-purple-500"></i>
+                                                        Medicine {{ $medicineCounter }}
+                                                    </h4>
+                                                    <button type="button" onclick="removeMedicine('medicine-{{ $medicineCounter }}')"
+                                                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                                        <i class="fas fa-times mr-1"></i> Remove
                                                     </button>
                                                 </div>
 
-                                                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                    <!-- Medicine Select -->
                                                     <div>
-                                                        <label class="block text-xs font-medium text-gray-700">Medicine</label>
-                                                        <select name="medicines[{{ $medicineCounter }}][id]" onchange="updateMedicinePrice(this, {{ $medicineCounter }})" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                                                        <label class="form-label text-xs">Medicine</label>
+                                                        <select name="medicines[{{ $medicineCounter }}][id]"
+                                                                onchange="updateMedicinePrice(this, {{ $medicineCounter }})"
+                                                                class="form-input text-sm">
                                                             <option value="">Select medicine</option>
                                                             @foreach($medicines as $med)
-                                                                <option value="{{ $med['id'] }}" data-name="{{ $med['name'] }}" {{ $item->medicine_id == $med['id'] ? 'selected' : '' }}>
+                                                                <option value="{{ $med['id'] }}"
+                                                                        data-name="{{ $med['name'] }}"
+                                                                        {{ $item->medicine_id == $med['id'] ? 'selected' : '' }}>
                                                                     {{ $med['name'] }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        <input type="hidden" name="medicines[{{ $medicineCounter }}][name]" value="{{ $item->medicine_name }}">
+                                                        <input type="hidden" name="medicines[{{ $medicineCounter }}][name]"
+                                                               value="{{ $item->medicine_name }}">
                                                     </div>
 
+                                                    <!-- Quantity -->
                                                     <div>
-                                                        <label class="block text-xs font-medium text-gray-700">Quantity</label>
-                                                        <input type="number" name="medicines[{{ $medicineCounter }}][quantity]" min="1" value="{{ $item->quantity }}" onchange="updateMedicineSubtotal({{ $medicineCounter }})" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                                                        <label class="form-label text-xs">Quantity</label>
+                                                        <input type="number" name="medicines[{{ $medicineCounter }}][quantity]"
+                                                               min="1" value="{{ $item->quantity }}"
+                                                               onchange="updateMedicineSubtotal({{ $medicineCounter }})"
+                                                               class="form-input text-sm">
                                                     </div>
 
+                                                    <!-- Unit Price -->
                                                     <div>
-                                                        <label class="block text-xs font-medium text-gray-700">Unit Price</label>
+                                                        <label class="form-label text-xs">Unit Price</label>
                                                         <div class="mt-1">
-                                                            <input type="number" id="price-{{ $medicineCounter }}" value="{{ $item->unit_price }}" readonly class="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm text-sm">
+                                                            <input type="number" id="price-{{ $medicineCounter }}"
+                                                                   value="{{ $item->unit_price }}" readonly
+                                                                   class="form-input bg-gray-50 dark:bg-gray-700 text-sm">
                                                         </div>
                                                     </div>
 
+                                                    <!-- Subtotal -->
                                                     <div>
-                                                        <label class="block text-xs font-medium text-gray-700">Subtotal</label>
+                                                        <label class="form-label text-xs">Subtotal</label>
                                                         <div class="mt-1">
-                                                            <input type="number" id="subtotal-{{ $medicineCounter }}" value="{{ $item->subtotal }}" readonly class="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm text-sm">
+                                                            <input type="number" id="subtotal-{{ $medicineCounter }}"
+                                                                   value="{{ $item->subtotal }}" readonly
+                                                                   class="form-input bg-gray-50 dark:bg-gray-700 text-sm">
                                                         </div>
                                                     </div>
 
+                                                    <!-- Instructions -->
                                                     <div class="md:col-span-4">
-                                                        <label class="block text-xs font-medium text-gray-700">Instructions</label>
-                                                        <textarea name="medicines[{{ $medicineCounter }}][instructions]" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Usage instructions...">{{ $item->instructions }}</textarea>
+                                                        <label class="form-label text-xs">
+                                                            <i class="fas fa-info-circle mr-1"></i>
+                                                            Instructions
+                                                        </label>
+                                                        <textarea name="medicines[{{ $medicineCounter }}][instructions]"
+                                                                  rows="2"
+                                                                  class="form-input text-sm"
+                                                                  placeholder="Usage instructions, dosage, frequency...">
+                                                            {{ $item->instructions }}
+                                                        </textarea>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
-                                    @else
-                                    <!-- Medicines will be added here dynamically -->
                                     @endif
                                 </div>
                             </div>
@@ -234,25 +375,44 @@
                         </div>
 
                         <!-- Summary -->
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Summary</h3>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-600">Number of Medicines:</p>
-                                    <p id="medicine-count" class="font-semibold">{{ $medicineCounter }}</p>
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-4 flex items-center">
+                                <i class="fas fa-receipt mr-3"></i>
+                                Summary
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                                    <div class="text-sm text-yellow-600 dark:text-yellow-400 mb-1">Number of Medicines</div>
+                                    <div id="medicine-count" class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {{ $medicineCounter }}
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="text-sm text-gray-600">Estimated Total:</p>
-                                    <p id="total-price" class="font-semibold text-xl">IDR {{ number_format($examination->prescription->total_price ?? 0, 0, ',', '.') }}</p>
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                                    <div class="text-sm text-yellow-600 dark:text-yellow-400 mb-1">Estimated Total</div>
+                                    <div id="total-price" class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        IDR {{ number_format($examination->prescription->total_price ?? 0, 0, ',', '.') }}
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                                    <div class="text-sm text-yellow-600 dark:text-yellow-400 mb-1">Examination Status</div>
+                                    <div class="text-xl font-bold text-gray-900 dark:text-white capitalize">
+                                        {{ $examination->status }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex justify-end space-x-3">
-                            <a href="{{ route('doctor.examinations.show', $examination->id) }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <a href="{{ route('doctor.examinations.show', $examination->id) }}"
+                               class="btn btn-secondary">
+                                <i class="fas fa-times mr-2"></i>
                                 Cancel
                             </a>
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" {{ $examination->prescription && !$examination->prescription->canBeEdited() ? 'disabled' : '' }}>
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    {{ $examination->prescription && !$examination->prescription->canBeEdited() ? 'disabled' : '' }}>
+                                <i class="fas fa-save mr-2"></i>
                                 Update Examination
                             </button>
                         </div>
@@ -263,7 +423,38 @@
     </div>
 
     @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            if (themeIcon) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+        }
+
+        // Medicine Functions (keep from original)
         const medicines = @json($medicines);
         let medicineCounter = {{ $medicineCounter }};
         let selectedMedicines = [];
@@ -273,18 +464,25 @@
             const id = `medicine-${++medicineCounter}`;
 
             const medicineHtml = `
-                <div id="${id}" class="border border-gray-300 rounded-lg p-4 bg-white">
-                    <div class="flex justify-between mb-2">
-                        <h4 class="font-medium">Medicine ${medicineCounter}</h4>
-                        <button type="button" onclick="removeMedicine('${id}')" class="text-red-600 hover:text-red-800">
-                            × Remove
+                <div id="${id}" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-medium text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-medkit mr-2 text-purple-500"></i>
+                            Medicine ${medicineCounter}
+                        </h4>
+                        <button type="button" onclick="removeMedicine('${id}')"
+                                class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                            <i class="fas fa-times mr-1"></i> Remove
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Medicine Select -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700">Medicine</label>
-                            <select name="medicines[${medicineCounter}][id]" onchange="updateMedicinePrice(this, ${medicineCounter})" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                            <label class="form-label text-xs">Medicine</label>
+                            <select name="medicines[${medicineCounter}][id]"
+                                    onchange="updateMedicinePrice(this, ${medicineCounter})"
+                                    class="form-input text-sm">
                                 <option value="">Select medicine</option>
                                 ${medicines.map(med => `
                                     <option value="${med.id}" data-name="${med.name}">${med.name}</option>
@@ -292,28 +490,43 @@
                             </select>
                         </div>
 
+                        <!-- Quantity -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700">Quantity</label>
-                            <input type="number" name="medicines[${medicineCounter}][quantity]" min="1" value="1" onchange="updateMedicineSubtotal(${medicineCounter})" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm">
+                            <label class="form-label text-xs">Quantity</label>
+                            <input type="number" name="medicines[${medicineCounter}][quantity]"
+                                   min="1" value="1"
+                                   onchange="updateMedicineSubtotal(${medicineCounter})"
+                                   class="form-input text-sm">
                         </div>
 
+                        <!-- Unit Price -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700">Unit Price</label>
+                            <label class="form-label text-xs">Unit Price</label>
                             <div class="mt-1">
-                                <input type="number" id="price-${medicineCounter}" readonly class="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm text-sm">
+                                <input type="number" id="price-${medicineCounter}" readonly
+                                       class="form-input bg-gray-50 dark:bg-gray-700 text-sm">
                             </div>
                         </div>
 
+                        <!-- Subtotal -->
                         <div>
-                            <label class="block text-xs font-medium text-gray-700">Subtotal</label>
+                            <label class="form-label text-xs">Subtotal</label>
                             <div class="mt-1">
-                                <input type="number" id="subtotal-${medicineCounter}" readonly class="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm text-sm">
+                                <input type="number" id="subtotal-${medicineCounter}" readonly
+                                       class="form-input bg-gray-50 dark:bg-gray-700 text-sm">
                             </div>
                         </div>
 
+                        <!-- Instructions -->
                         <div class="md:col-span-4">
-                            <label class="block text-xs font-medium text-gray-700">Instructions</label>
-                            <textarea name="medicines[${medicineCounter}][instructions]" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm" placeholder="Usage instructions..."></textarea>
+                            <label class="form-label text-xs">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Instructions
+                            </label>
+                            <textarea name="medicines[${medicineCounter}][instructions]"
+                                      rows="2"
+                                      class="form-input text-sm"
+                                      placeholder="Usage instructions, dosage, frequency..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -331,7 +544,6 @@
             // Update medicine name
             select.name = `medicines[${index}][name]`;
 
-            // Fetch price from API
             try {
                 const response = await fetch(`/api/medicine-price/${medicineId}`);
                 const data = await response.json();
@@ -385,39 +597,45 @@
         }
 
         // Calculate BMI
-        document.getElementById('height')?.addEventListener('input', calculateBMI);
-        document.getElementById('weight')?.addEventListener('input', calculateBMI);
-
         function calculateBMI() {
-            const height = parseFloat(document.getElementById('height').value) / 100; // convert to meters
+            const height = parseFloat(document.getElementById('height').value) / 100;
             const weight = parseFloat(document.getElementById('weight').value);
+            const bmiDisplay = document.getElementById('bmi-display');
+            const bmiIndicator = document.getElementById('bmi-indicator');
+            const bmiInput = document.getElementById('bmi');
 
             if (height > 0 && weight > 0) {
                 const bmi = weight / (height * height);
-                document.getElementById('bmi-display').textContent = bmi.toFixed(1);
-                document.getElementById('bmi').value = bmi.toFixed(1);
+                bmiDisplay.textContent = bmi.toFixed(1);
+                bmiInput.value = bmi.toFixed(1);
 
-                // Color coding
-                const bmiDisplay = document.getElementById('bmi-display');
+                // Set BMI category and color
+                let category = '';
+                let color = '';
+
                 if (bmi < 18.5) {
-                    bmiDisplay.className = 'mt-2 text-lg font-semibold text-blue-600';
+                    category = 'Underweight';
+                    color = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
                 } else if (bmi < 25) {
-                    bmiDisplay.className = 'mt-2 text-lg font-semibold text-green-600';
+                    category = 'Normal';
+                    color = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
                 } else if (bmi < 30) {
-                    bmiDisplay.className = 'mt-2 text-lg font-semibold text-yellow-600';
+                    category = 'Overweight';
+                    color = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
                 } else {
-                    bmiDisplay.className = 'mt-2 text-lg font-semibold text-red-600';
+                    category = 'Obese';
+                    color = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
                 }
+
+                bmiIndicator.className = `text-xs font-semibold px-2 py-1 rounded-full ${color}`;
+                bmiIndicator.textContent = category;
             } else {
-                document.getElementById('bmi-display').textContent = '-';
-                document.getElementById('bmi-display').className = 'mt-2 text-lg font-semibold text-gray-900';
+                bmiDisplay.textContent = '-';
+                bmiIndicator.textContent = '';
             }
         }
 
         // Calculate Blood Pressure
-        document.getElementById('systolic')?.addEventListener('input', updateBP);
-        document.getElementById('diastolic')?.addEventListener('input', updateBP);
-
         function updateBP() {
             const systolic = parseInt(document.getElementById('systolic').value);
             const diastolic = parseInt(document.getElementById('diastolic').value);
@@ -426,19 +644,19 @@
             if (systolic && diastolic) {
                 bpDisplay.textContent = `${systolic}/${diastolic} mmHg`;
 
-                // Color coding based on blood pressure
+                // Set color based on BP category
                 if (systolic < 120 && diastolic < 80) {
-                    bpDisplay.className = 'mt-2 text-sm text-green-600';
+                    bpDisplay.className = 'text-xl font-semibold text-green-600 dark:text-green-400 mt-1';
                 } else if (systolic < 130 && diastolic < 80) {
-                    bpDisplay.className = 'mt-2 text-sm text-yellow-600';
+                    bpDisplay.className = 'text-xl font-semibold text-yellow-600 dark:text-yellow-400 mt-1';
                 } else if (systolic < 140 || diastolic < 90) {
-                    bpDisplay.className = 'mt-2 text-sm text-orange-600';
+                    bpDisplay.className = 'text-xl font-semibold text-orange-600 dark:text-orange-400 mt-1';
                 } else {
-                    bpDisplay.className = 'mt-2 text-sm text-red-600';
+                    bpDisplay.className = 'text-xl font-semibold text-red-600 dark:text-red-400 mt-1';
                 }
             } else {
                 bpDisplay.textContent = '-';
-                bpDisplay.className = 'mt-2 text-sm text-gray-900';
+                bpDisplay.className = 'text-xl font-semibold text-gray-900 dark:text-white mt-1';
             }
         }
 

@@ -199,4 +199,32 @@ class DashboardController extends Controller
         return redirect()->back()
             ->with('success', 'Report exported successfully.');
     }
+
+    public function revenueReport(Request $request)
+    {
+        $startDate = $request->get('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->get('end_date', now()->endOfMonth()->format('Y-m-d'));
+
+        $revenueData = Prescription::select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('COUNT(*) as prescriptions'),
+                DB::raw('SUM(total_price) as revenue')
+            )
+            ->where('status', 'completed')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $totalRevenue = $revenueData->sum('revenue');
+        $totalPrescriptions = $revenueData->sum('prescriptions');
+
+        return view('admin.reports.revenue', compact(
+            'revenueData',
+            'totalRevenue',
+            'totalPrescriptions',
+            'startDate',
+            'endDate'
+        ));
+    }
 }

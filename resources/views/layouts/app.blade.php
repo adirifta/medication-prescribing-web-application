@@ -1,12 +1,11 @@
-{{-- resources/views/layouts/app.blade.php --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name', 'MediScript Pro'))</title>
+    <title>{{ config('app.name', 'MediScript Pro') }} - @yield('title', 'Dashboard')</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,290 +15,257 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900">
-    <!-- Sidebar Navigation -->
-    <div class="flex min-h-screen">
+    <!-- Sidebar for Desktop -->
+    <div class="hidden lg:flex">
         <!-- Sidebar -->
-        <div class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0">
-            <div class="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 pt-5 pb-4">
-                <!-- Logo -->
-                <div class="flex items-center flex-shrink-0 px-6">
+        <div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 min-h-screen">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
                     <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
                         <i class="fas fa-pills text-white"></i>
                     </div>
-                    <div class="ml-3">
-                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">MediScript</h1>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Admin Dashboard</p>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-900 dark:text-white">MediScript Pro</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Admin Panel</p>
                     </div>
+                </a>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="p-4 space-y-2">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                    <i class="fas fa-tachometer-alt w-5"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="pt-2">
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Manajemen</p>
+                    <a href="{{ route('admin.users.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Users</span>
+                    </a>
+                    <a href="{{ route('admin.patients.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('admin.patients.*') ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : '' }}">
+                        <i class="fas fa-user-injured w-5"></i>
+                        <span>Patients</span>
+                    </a>
+                    <a href="{{ route('admin.reports') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                        <i class="fas fa-file-prescription w-5"></i>
+                        <span>Reports</span>
+                    </a>
                 </div>
 
-                <!-- Navigation -->
-                <div class="mt-8 flex-1 flex flex-col overflow-y-auto">
-                    <nav class="flex-1 px-4 space-y-2">
-                        <!-- Dashboard -->
-                        <a href="{{ route('admin.dashboard') }}"
-                           class="{{ request()->routeIs('admin.dashboard') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-tachometer-alt mr-3 text-lg"></i>
-                            Dashboard
-                        </a>
+                <div class="pt-2">
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Laporan</p>
+                    <a href="{{ route('admin.reports') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>Revenue Report</span>
+                    </a>
+                    <a href="{{ route('admin.audit-logs.index') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                        <i class="fas fa-history w-5"></i>
+                        <span>Audit Logs</span>
+                    </a>
+                </div>
 
-                        <!-- User Management -->
-                        <a href="{{ route('admin.users.index') }}"
-                           class="{{ request()->routeIs('admin.users.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-users mr-3 text-lg"></i>
-                            User Management
-                        </a>
+                <div class="pt-2">
+                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2">Pengaturan</p>
+                    <a href="" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                        <i class="fas fa-cog w-5"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
 
-                        <!-- Patients -->
-                        <a href="{{ route('admin.patients.index') }}"
-                           class="{{ request()->routeIs('admin.patients.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-user-injured mr-3 text-lg"></i>
-                            Patients
-                        </a>
-
-                        <!-- Prescriptions -->
-                        <a href="{{ route('admin.prescriptions.index') }}"
-                           class="{{ request()->routeIs('admin.prescriptions.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-prescription mr-3 text-lg"></i>
-                            Prescriptions
-                        </a>
-
-                        <!-- Examinations -->
-                        <a href="{{ route('admin.examinations.index') }}"
-                           class="{{ request()->routeIs('admin.examinations.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-stethoscope mr-3 text-lg"></i>
-                            Examinations
-                        </a>
-
-                        <!-- Audit Logs -->
-                        <a href="{{ route('admin.audit-logs.index') }}"
-                           class="{{ request()->routeIs('admin.audit-logs.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-history mr-3 text-lg"></i>
-                            Audit Logs
-                        </a>
-
-                        <!-- API Settings -->
-                        <a href="{{ route('admin.api-settings') }}"
-                           class="{{ request()->routeIs('admin.api-settings') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-plug mr-3 text-lg"></i>
-                            API Settings
-                        </a>
-
-                        <!-- Reports -->
-                        <a href="{{ route('admin.reports') }}"
-                           class="{{ request()->routeIs('admin.reports') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }} group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors">
-                            <i class="fas fa-chart-bar mr-3 text-lg"></i>
-                            Reports
-                        </a>
-                    </nav>
-
-                    <!-- User Profile -->
-                    <div class="mt-auto px-4 py-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="w-10 h-10 gradient-primary rounded-full flex items-center justify-center">
-                                    <span class="text-white font-semibold">
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ Auth::user()->name }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ ucfirst(Auth::user()->role) }}
-                                </p>
-                            </div>
-                            <!-- Settings Dropdown -->
-                            <div class="ml-auto relative">
-                                <x-dropdown align="right" width="48">
-                                    <x-slot name="trigger">
-                                        <button class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </x-slot>
-
-                                    <x-slot name="content">
-                                        <!-- Authentication -->
-                                        <form method="POST" action="{{ route('logout') }}">
-                                            @csrf
-                                            <x-dropdown-link :href="route('logout')"
-                                                    onclick="event.preventDefault();
-                                                                this.closest('form').submit();">
-                                                <i class="fas fa-sign-out-alt mr-2"></i>
-                                                {{ __('Log Out') }}
-                                            </x-dropdown-link>
-                                        </form>
-                                    </x-slot>
-                                </x-dropdown>
-                            </div>
-                        </div>
+            <!-- User Profile -->
+            <div class="absolute bottom-0 w-64 p-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-circle text-gray-600 dark:text-gray-400 text-xl"></i>
                     </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ Auth::user()->name }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->role }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="flex flex-col flex-1 lg:pl-64">
-            <!-- Top Navigation Bar -->
-            <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <!-- Mobile menu button -->
-                <button type="button" class="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 lg:hidden" id="sidebar-toggle">
-                    <span class="sr-only">Open sidebar</span>
-                    <i class="fas fa-bars h-6 w-6"></i>
-                </button>
-
-                <!-- Header Content -->
-                <div class="flex-1 px-4 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <div class="flex-1">
+            <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <div class="px-8 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
                             @yield('header')
-                        </h2>
-                        @hasSection('subheader')
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                @yield('subheader')
-                            </p>
-                        @endif
+                        </div>
+
+                        <!-- Mobile menu button (hidden on desktop) -->
+                        <button id="mobile-menu-button" class="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-8">
+                {{ $slot }}
+            </main>
+        </div>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="lg:hidden">
+        <!-- Mobile Header -->
+        <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 mr-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-2">
+                            <div class="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+                                <i class="fas fa-pills text-white"></i>
+                            </div>
+                            <span class="text-lg font-bold text-gray-900 dark:text-white">MediScript</span>
+                        </a>
                     </div>
 
-                    <div class="flex items-center space-x-4">
-                        <!-- Dark Mode Toggle -->
-                        <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
-                            <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
+                    <div class="flex items-center space-x-2">
+                        <button id="theme-toggle-mobile" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
+                            <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon-mobile"></i>
                         </button>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-                        <!-- Notifications -->
-                        <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 relative">
-                            <i class="fas fa-bell text-gray-600 dark:text-gray-400"></i>
-                            @if($unreadNotifications > 0)
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {{ $unreadNotifications }}
-                                </span>
-                            @endif
-                        </button>
+        <!-- Mobile Sidebar -->
+        <div id="mobile-sidebar" class="fixed inset-0 z-50 hidden">
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-75" onclick="toggleMobileMenu()"></div>
+            <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
+                <div class="absolute top-0 right-0 -mr-12 pt-2">
+                    <button onclick="toggleMobileMenu()" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <i class="fas fa-times text-white"></i>
+                    </button>
+                </div>
 
-                        <!-- Quick Actions -->
-                        <div class="hidden md:flex items-center space-x-2">
-                            <a href="{{ route('admin.prescriptions.create') }}" class="btn btn-primary text-sm">
-                                <i class="fas fa-plus mr-2"></i>New Prescription
+                <div class="pt-5 pb-4">
+                    <div class="flex items-center px-4">
+                        <div class="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-pills text-white"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-base font-medium text-gray-900 dark:text-white">MediScript Pro</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
+                        </div>
+                    </div>
+
+                    <nav class="mt-5 px-2 space-y-1">
+                        <a href="{{ route('admin.dashboard') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            <i class="fas fa-tachometer-alt mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                            Dashboard
+                        </a>
+
+                        <a href="{{ route('admin.users.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            <i class="fas fa-users mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                            Users
+                        </a>
+
+                        <a href="{{ route('admin.patients.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            <i class="fas fa-user-injured mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                            Patients
+                        </a>
+
+                        <a href="" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                            <i class="fas fa-file-prescription mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                            Prescriptions
+                        </a>
+
+                        <div class="pt-4">
+                            <p class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Laporan</p>
+                            <a href="" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-chart-line mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Revenue Report
+                            </a>
+                            <a href="{{ route('admin.audit-logs.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md">
+                                <i class="fas fa-history mr-4 text-gray-400 group-hover:text-gray-500"></i>
+                                Audit Logs
                             </a>
                         </div>
-                    </div>
+                    </nav>
                 </div>
-            </div>
 
-            <!-- Main Content Area -->
-            <main class="flex-1">
-                <div class="py-6">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <!-- Page Content -->
-                        {{ $slot }}
-                    </div>
-                </div>
-            </main>
-
-            <!-- Footer -->
-            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center">
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
-                            &copy; {{ date('Y') }} MediScript Pro. All rights reserved.
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 pb-3">
+                    <div class="px-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-circle text-gray-600 dark:text-gray-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-base font-medium text-gray-900 dark:text-white">{{ Auth::user()->name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Administrator</p>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-4 mt-2 md:mt-0">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-database mr-1"></i>
-                                {{ $databaseSize }} MB
-                            </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                <i class="fas fa-server mr-1"></i>
-                                v{{ config('app.version', '1.0.0') }}
-                            </span>
+
+                        <div class="mt-3 space-y-1">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center px-4 py-2 text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md">
+                                    <i class="fas fa-sign-out-alt mr-3"></i>
+                                    Sign Out
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Mobile Sidebar -->
-    <div class="fixed inset-0 flex z-40 lg:hidden" id="mobile-sidebar" style="display: none;">
-        <div class="fixed inset-0 bg-gray-600 bg-opacity-75" id="sidebar-backdrop"></div>
-        <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
-            <div class="absolute top-0 right-0 -mr-12 pt-2">
-                <button type="button" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" id="mobile-sidebar-close">
-                    <span class="sr-only">Close sidebar</span>
-                    <i class="fas fa-times text-white"></i>
-                </button>
-            </div>
-            <!-- Mobile sidebar content -->
-            <div class="pt-5 pb-4 flex-1">
-                <!-- Mobile navigation items -->
-                <!-- Reuse navigation items from desktop sidebar -->
             </div>
         </div>
+
+        <!-- Mobile Main Content -->
+        <main class="p-4">
+            {{ $slot }}
+        </main>
     </div>
 
-    <!-- Scripts -->
+    <!-- Mobile Menu Script -->
     <script>
-        // Theme toggle
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-
-        if (localStorage.getItem('theme') === 'dark' ||
-            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            if (themeIcon) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            }
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            sidebar.classList.toggle('hidden');
         }
 
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
+        document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
+
+        // Theme toggle for mobile
+        const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+        const themeIconMobile = document.getElementById('theme-icon-mobile');
+
+        if (themeToggleMobile) {
+            themeToggleMobile.addEventListener('click', () => {
                 document.documentElement.classList.toggle('dark');
 
                 if (document.documentElement.classList.contains('dark')) {
                     localStorage.setItem('theme', 'dark');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
+                    themeIconMobile.classList.remove('fa-moon');
+                    themeIconMobile.classList.add('fa-sun');
                 } else {
                     localStorage.setItem('theme', 'light');
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
+                    themeIconMobile.classList.remove('fa-sun');
+                    themeIconMobile.classList.add('fa-moon');
                 }
-            });
-        }
-
-        // Mobile sidebar toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const mobileSidebar = document.getElementById('mobile-sidebar');
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
-
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                mobileSidebar.style.display = 'flex';
-            });
-        }
-
-        if (sidebarBackdrop) {
-            sidebarBackdrop.addEventListener('click', () => {
-                mobileSidebar.style.display = 'none';
-            });
-        }
-
-        if (mobileSidebarClose) {
-            mobileSidebarClose.addEventListener('click', () => {
-                mobileSidebar.style.display = 'none';
             });
         }
     </script>

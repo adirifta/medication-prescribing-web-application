@@ -1,170 +1,213 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Patient Management') }}
-            </h2>
-            <a href="{{ route('doctor.patients.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                + New Patient
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('Patient Management') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Manage your patient records and examinations
+                </p>
+            </div>
+            <a href="{{ route('doctor.patients.create') }}" class="btn btn-primary flex items-center gap-2">
+                <i class="fas fa-user-plus"></i>
+                New Patient
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Search and Filters -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card mb-6">
                 <div class="p-6">
-                    <form method="GET" class="flex space-x-4">
+                    <form method="GET" class="flex flex-col sm:flex-row gap-4">
                         <div class="flex-1">
-                            <input type="text" name="search" value="{{ $search }}" placeholder="Search by name, MRN, or phone..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    value="{{ $search }}"
+                                    placeholder="Search by name, MRN, or phone..."
+                                    class="form-input pl-10"
+                                >
+                            </div>
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            Search
-                        </button>
-                        @if($search)
-                        <a href="{{ route('doctor.patients.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                            Clear
-                        </a>
-                        @endif
+                        <div class="flex gap-2">
+                            <button type="submit" class="btn btn-primary px-6">
+                                <i class="fas fa-search mr-2"></i>
+                                Search
+                            </button>
+                            @if($search)
+                                <a href="{{ route('doctor.patients.index') }}" class="btn btn-secondary px-6">
+                                    <i class="fas fa-times mr-2"></i>
+                                    Clear
+                                </a>
+                            @endif
+                        </div>
                     </form>
                 </div>
             </div>
 
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+                <div class="card">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mr-4">
+                                <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Patients</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $patients->total() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mr-4">
+                                <i class="fas fa-file-medical text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Total Examinations</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $totalExaminations }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mr-4">
+                                <i class="fas fa-calendar-check text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Today's Visits</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $todayVisits }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Patients Table -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
                     @if($patients->count() > 0)
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            MRN
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Patient
                                         </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Patient Name
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                                            Contact
                                         </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Gender / Age
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Phone
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Examinations
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                             Last Visit
                                         </th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach($patients as $patient)
-                                        <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $patient->medical_record_number }}
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                        <td class="px-4 py-4">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mr-3">
+                                                    <span class="text-blue-600 dark:text-blue-400 font-semibold">
+                                                        {{ substr($patient->name, 0, 1) }}
+                                                    </span>
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                                        <span class="text-blue-600 font-medium">
-                                                            {{ substr($patient->name, 0, 1) }}
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {{ $patient->name }}
+                                                    </div>
+                                                    <div class="flex items-center mt-1">
+                                                        <span class="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 mr-2">
+                                                            {{ $patient->medical_record_number }}
+                                                        </span>
+                                                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ ucfirst($patient->gender) }} • {{ $patient->age }} yrs
                                                         </span>
                                                     </div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $patient->name }}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ $patient->date_of_birth->format('d M Y') }}
-                                                        </div>
-                                                    </div>
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">
-                                                    {{ ucfirst($patient->gender) }}
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="text-sm text-gray-900 dark:text-white">{{ $patient->phone }}</div>
+                                            @if($patient->email)
+                                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ $patient->email }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            @if($patient->examinations->count() > 0)
+                                                <div class="text-sm text-gray-900 dark:text-white">
+                                                    {{ $patient->examinations->first()->examination_date->format('d M Y') }}
                                                 </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{ $patient->age }} years
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm text-gray-900">
-                                                    {{ $patient->phone }}
-                                                </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
                                                     {{ $patient->examinations_count ?? 0 }} visits
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                @if($patient->examinations->count() > 0)
-                                                    <div class="text-sm text-gray-900">
-                                                        {{ $patient->examinations->first()->examination_date->format('d M Y') }}
-                                                    </div>
-                                                @else
-                                                    <div class="text-sm text-gray-500">Never</div>
-                                                @endif
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div class="flex space-x-2">
-                                                    <a href="{{ route('doctor.patients.show', $patient->id) }}" class="text-blue-600 hover:text-blue-900" title="View">
-                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                    </a>
-                                                    <a href="{{ route('doctor.patients.edit', $patient->id) }}" class="text-green-600 hover:text-green-900" title="Edit">
-                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg>
-                                                    </a>
-                                                    <a href="{{ route('doctor.examinations.create', ['patient_id' => $patient->id]) }}" class="text-purple-600 hover:text-purple-900" title="New Examination">
-                                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                        </svg>
-                                                    </a>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            @else
+                                                <div class="text-sm text-gray-500 dark:text-gray-400 italic">No visits yet</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-4">
+                                            <div class="flex items-center space-x-2">
+                                                <a href="{{ route('doctor.patients.show', $patient->id) }}"
+                                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                                   title="View Patient">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('doctor.patients.edit', $patient->id) }}"
+                                                   class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 p-2 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20"
+                                                   title="Edit Patient">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{{ route('doctor.examinations.create', ['patient_id' => $patient->id]) }}"
+                                                   class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                                                   title="New Examination">
+                                                    <i class="fas fa-file-medical"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Pagination -->
-                        <div class="mt-4">
+                        <div class="mt-6">
                             {{ $patients->links() }}
                         </div>
                     @else
-                        <div class="text-center py-8">
-                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <h3 class="mt-2 text-sm font-medium text-gray-900">No patients found</h3>
-                            <p class="mt-1 text-sm text-gray-500">
+                        <div class="text-center py-12">
+                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-injured text-gray-400 dark:text-gray-600 text-3xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No patients found</h3>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                                 @if($search)
-                                    No patients match your search criteria.
+                                    No patients match your search criteria. Try different keywords.
                                 @else
-                                    Get started by creating a new patient.
+                                    You haven't added any patients yet. Start by creating your first patient record.
                                 @endif
                             </p>
-                            <div class="mt-6">
-                                <a href="{{ route('doctor.patients.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                    New Patient
-                                </a>
-                            </div>
+                            <a href="{{ route('doctor.patients.create') }}" class="btn btn-primary inline-flex items-center gap-2">
+                                <i class="fas fa-user-plus"></i>
+                                Add First Patient
+                            </a>
                         </div>
                     @endif
                 </div>

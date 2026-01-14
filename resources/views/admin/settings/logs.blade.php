@@ -1,50 +1,92 @@
+{{-- resources/views/admin/settings/logs.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('System Logs') }}
-            </h2>
-            <div class="flex space-x-2">
-                <form action="{{ route('admin.settings.clear-logs') }}" method="POST" onsubmit="return confirm('Clear all system logs?');">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ __('System Logs') }}
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    View application logs and error messages
+                </p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <form action="{{ route('admin.settings.clear-logs') }}" method="POST"
+                      onsubmit="return confirm('Clear all system logs?');">
                     @csrf
-                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700">
+                    <button type="submit" class="btn bg-red-600 hover:bg-red-700 text-white">
+                        <i class="fas fa-trash-alt mr-2"></i>
                         Clear Logs
                     </button>
                 </form>
-                <a href="{{ route('admin.settings.index') }}" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400">
-                    ← Back to Settings
+                <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Settings
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Log File Info -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">Laravel Log File</h3>
-                        <div class="text-sm text-gray-500">
-                            Last modified:
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Flash Messages -->
+            @if (session('success'))
+                <div class="mb-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                        <span class="text-green-800 dark:text-green-200">{{ session('success') }}</span>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Log File Information -->
+            <div class="card mb-8">
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                Laravel Log File
+                            </h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                Application logs from storage/logs/laravel.log
+                            </p>
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400 mt-4 md:mt-0">
                             @if(file_exists(storage_path('logs/laravel.log')))
-                                {{ date('d M Y H:i:s', filemtime(storage_path('logs/laravel.log'))) }}
+                                <i class="fas fa-clock mr-2"></i>
+                                Last modified: {{ date('d M Y H:i:s', filemtime(storage_path('logs/laravel.log'))) }}
                             @endif
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="p-4 bg-blue-50 rounded-lg">
-                            <div class="text-sm text-blue-700">File Location</div>
-                            <div class="text-sm font-medium text-gray-900 truncate">storage/logs/laravel.log</div>
+                    <!-- Log Statistics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                            <div class="text-sm text-blue-600 dark:text-blue-400 mb-2">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                File Location
+                            </div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                                storage/logs/laravel.log
+                            </div>
                         </div>
-                        <div class="p-4 bg-green-50 rounded-lg">
-                            <div class="text-sm text-green-700">Log Entries</div>
-                            <div class="text-2xl font-bold text-gray-900">{{ count($logs) }}</div>
+
+                        <div class="p-4 bg-green-50 dark:bg-green-900/30 rounded-xl">
+                            <div class="text-sm text-green-600 dark:text-green-400 mb-2">
+                                <i class="fas fa-list-alt mr-2"></i>
+                                Log Entries
+                            </div>
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white">
+                                {{ count($logs) }}
+                            </div>
                         </div>
-                        <div class="p-4 bg-purple-50 rounded-lg">
-                            <div class="text-sm text-purple-700">File Size</div>
-                            <div class="text-2xl font-bold text-gray-900">
+
+                        <div class="p-4 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
+                            <div class="text-sm text-purple-600 dark:text-purple-400 mb-2">
+                                <i class="fas fa-weight-hanging mr-2"></i>
+                                File Size
+                            </div>
+                            <div class="text-2xl font-bold text-gray-900 dark:text-white">
                                 @if(file_exists(storage_path('logs/laravel.log')))
                                     {{ round(filesize(storage_path('logs/laravel.log')) / 1024, 2) }} KB
                                 @else
@@ -54,16 +96,15 @@
                         </div>
                     </div>
 
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <!-- Security Warning -->
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
                         <div class="flex">
-                            <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-yellow-800">Warning</h3>
-                                <div class="mt-2 text-sm text-yellow-700">
-                                    <p>System logs may contain sensitive information. Only authorized administrators should view this page.</p>
-                                    <p class="mt-1">Logs are automatically rotated and old entries may be deleted.</p>
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
+                            <div class="ml-4">
+                                <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Security Notice</h4>
+                                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                    <p>System logs may contain sensitive information including passwords, API keys, and user data.</p>
+                                    <p class="mt-1">Access to this page should be restricted to authorized administrators only.</p>
                                 </div>
                             </div>
                         </div>
@@ -72,60 +113,50 @@
             </div>
 
             <!-- Log Entries -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Log Entries (Last 100)</h3>
+            <div class="card">
+                <div class="p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                            Recent Log Entries
+                        </h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            Showing last 100 entries
+                        </span>
+                    </div>
 
                     @if(count($logs) > 0)
-                    <div class="space-y-2 max-h-[600px] overflow-y-auto">
-                        @foreach($logs as $index => $logLine)
+                    <div class="space-y-3 max-h-[600px] overflow-y-auto">
+                        @foreach($logs as $logLine)
                         @php
-                            // Parse log line for color coding
-                            $bgColor = 'bg-gray-50';
-                            $textColor = 'text-gray-800';
-                            $iconColor = 'text-gray-500';
+                            $bgColor = 'bg-gray-50 dark:bg-gray-800';
+                            $textColor = 'text-gray-800 dark:text-gray-300';
+                            $icon = 'fa-circle';
 
-                            if (str_contains($logLine, 'ERROR') || str_contains($logLine, 'CRITICAL')) {
-                                $bgColor = 'bg-red-50';
-                                $textColor = 'text-red-800';
-                                $iconColor = 'text-red-500';
-                            } elseif (str_contains($logLine, 'WARNING') || str_contains($logLine, 'ALERT')) {
-                                $bgColor = 'bg-yellow-50';
-                                $textColor = 'text-yellow-800';
-                                $iconColor = 'text-yellow-500';
-                            } elseif (str_contains($logLine, 'INFO') || str_contains($logLine, 'NOTICE')) {
-                                $bgColor = 'bg-blue-50';
-                                $textColor = 'text-blue-800';
-                                $iconColor = 'text-blue-500';
-                            } elseif (str_contains($logLine, 'DEBUG')) {
-                                $bgColor = 'bg-gray-100';
-                                $textColor = 'text-gray-600';
-                                $iconColor = 'text-gray-500';
+                            if (preg_match('/ERROR|CRITICAL/i', $logLine)) {
+                                $bgColor = 'bg-red-50 dark:bg-red-900/20';
+                                $textColor = 'text-red-800 dark:text-red-300';
+                                $icon = 'fa-exclamation-circle';
+                            } elseif (preg_match('/WARNING|ALERT/i', $logLine)) {
+                                $bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
+                                $textColor = 'text-yellow-800 dark:text-yellow-300';
+                                $icon = 'fa-exclamation-triangle';
+                            } elseif (preg_match('/INFO|NOTICE/i', $logLine)) {
+                                $bgColor = 'bg-blue-50 dark:bg-blue-900/20';
+                                $textColor = 'text-blue-800 dark:text-blue-300';
+                                $icon = 'fa-info-circle';
+                            } elseif (preg_match('/DEBUG/i', $logLine)) {
+                                $bgColor = 'bg-gray-100 dark:bg-gray-800';
+                                $textColor = 'text-gray-600 dark:text-gray-400';
+                                $icon = 'fa-bug';
                             }
                         @endphp
-                        <div class="p-3 {{ $bgColor }} rounded-lg">
+                        <div class="{{ $bgColor }} p-4 rounded-xl">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    @if(str_contains($logLine, 'ERROR') || str_contains($logLine, 'CRITICAL'))
-                                    <svg class="h-5 w-5 {{ $iconColor }}" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                    </svg>
-                                    @elseif(str_contains($logLine, 'WARNING'))
-                                    <svg class="h-5 w-5 {{ $iconColor }}" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                    </svg>
-                                    @elseif(str_contains($logLine, 'INFO'))
-                                    <svg class="h-5 w-5 {{ $iconColor }}" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                                    </svg>
-                                    @else
-                                    <svg class="h-5 w-5 {{ $iconColor }}" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-                                    </svg>
-                                    @endif
+                                    <i class="fas {{ $icon }} {{ str_replace('text-', 'text-', $icon == 'fa-circle' ? 'text-gray-400' : 'text-' . explode('-', $textColor)[1] . '-500') }} mt-1"></i>
                                 </div>
-                                <div class="ml-3 flex-1">
-                                    <div class="text-sm font-mono {{ $textColor }} whitespace-pre-wrap break-all">
+                                <div class="ml-4 flex-1">
+                                    <div class="font-mono text-sm {{ $textColor }} whitespace-pre-wrap break-all">
                                         {{ $logLine }}
                                     </div>
                                 </div>
@@ -134,10 +165,87 @@
                         @endforeach
                     </div>
                     @else
-                    <div class="text-center py-8 text-gray-500">
-                        No log entries found.
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-file-alt text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No log entries found</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            The log file is empty or doesn't exist.
+                        </p>
                     </div>
                     @endif
+                </div>
+            </div>
+
+            <!-- Log Information Cards -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card">
+                    <div class="p-6">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                            Log Information
+                        </h4>
+                        <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                            <li class="flex items-center">
+                                <i class="fas fa-folder mr-2"></i>
+                                Location: storage/logs/
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-history mr-2"></i>
+                                Auto-rotation: Daily
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-shield-alt mr-2"></i>
+                                Retention: 14 days
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="p-6">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                            Log Types
+                        </h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">ERROR - Critical issues</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">WARNING - Potential issues</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">INFO - General information</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="p-6">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                            <i class="fas fa-cogs mr-2 text-green-500"></i>
+                            Log Management
+                        </h4>
+                        <div class="space-y-3">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                Regular log rotation is configured to prevent excessive disk usage.
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-gray-600 dark:text-gray-400">Admin access only</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                <span class="text-gray-600 dark:text-gray-400">Automatic cleanup</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

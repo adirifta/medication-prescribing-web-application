@@ -1,136 +1,213 @@
+{{-- resources/views/doctor/examinations/show.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Examination Details') }}
-            </h2>
-            <div class="flex space-x-2">
-                <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="inline-flex items-center px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">
-                    Edit
-                </a>
-                <a href="{{ route('doctor.examinations.index') }}" class="inline-flex items-center px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400">
-                    ← Back to List
-                </a>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Examination Details
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    View examination information and prescription
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
+                </button>
+                <div class="flex space-x-2">
+                    @if(!$examination->prescription || $examination->prescription->canBeEdited())
+                    <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit mr-2"></i>
+                        Edit
+                    </a>
+                    @endif
+                    <a href="{{ route('doctor.examinations.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to List
+                    </a>
+                </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Patient Info Card -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Patient Info -->
+            <div class="card mb-6">
                 <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                    <div class="flex flex-col md:flex-row md:items-center justify-between">
+                        <div class="flex items-center mb-4 md:mb-0">
+                            <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user-injured text-white text-2xl"></i>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-xl font-bold text-gray-900">{{ $examination->patient->name }}</h3>
-                                <div class="text-sm text-gray-500">
-                                    MRN: {{ $examination->patient->medical_record_number }} |
-                                    {{ $examination->patient->gender == 'male' ? 'Male' : 'Female' }}, {{ $examination->patient->age }} years
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->patient->name }}
+                                </h3>
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    <span class="flex items-center">
+                                        <i class="fas fa-id-card mr-2"></i>
+                                        MRN: {{ $examination->patient->medical_record_number }}
+                                    </span>
+                                    <span class="flex items-center mt-1">
+                                        <i class="fas fa-venus-mars mr-2"></i>
+                                        {{ ucfirst($examination->patient->gender) }}, {{ $examination->patient->age }} years
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <div class="text-sm text-gray-500">Examination Date</div>
-                            <div class="text-lg font-semibold text-gray-900">{{ $examination->formatted_examination_date }}</div>
+                        <div class="text-center md:text-right">
+                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Examination Date</div>
+                            <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ $examination->formatted_examination_date }}
+                            </div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {{ $examination->created_at->format('H:i') }} WIB
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Vital Signs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <!-- Vital Signs and Doctor Notes -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Vital Signs -->
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Vital Signs</h4>
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <i class="fas fa-heart-pulse mr-3 text-red-500"></i>
+                            Vital Signs
+                        </h4>
 
                         <div class="grid grid-cols-2 gap-4">
                             @if($examination->height)
-                            <div class="p-3 bg-blue-50 rounded-lg">
-                                <div class="text-sm text-blue-700">Height</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->height }} cm</div>
+                            <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+                                <div class="text-sm text-blue-700 dark:text-blue-300 mb-2 flex items-center">
+                                    <i class="fas fa-ruler-vertical mr-2"></i>
+                                    Height
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->height }} cm
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->weight)
-                            <div class="p-3 bg-blue-50 rounded-lg">
-                                <div class="text-sm text-blue-700">Weight</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->weight }} kg</div>
+                            <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+                                <div class="text-sm text-blue-700 dark:text-blue-300 mb-2 flex items-center">
+                                    <i class="fas fa-weight-scale mr-2"></i>
+                                    Weight
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->weight }} kg
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->bmi)
-                            <div class="p-3 bg-green-50 rounded-lg">
-                                <div class="text-sm text-green-700">BMI</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->bmi }}</div>
+                            <div class="p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-lg">
+                                <div class="text-sm text-green-700 dark:text-green-300 mb-2 flex items-center">
+                                    <i class="fas fa-chart-line mr-2"></i>
+                                    BMI
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->bmi }}
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->blood_pressure)
-                            <div class="p-3 bg-green-50 rounded-lg">
-                                <div class="text-sm text-green-700">Blood Pressure</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->blood_pressure }}</div>
+                            <div class="p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg">
+                                <div class="text-sm text-red-700 dark:text-red-300 mb-2 flex items-center">
+                                    <i class="fas fa-tachometer-alt mr-2"></i>
+                                    Blood Pressure
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->blood_pressure }}
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->heart_rate)
-                            <div class="p-3 bg-purple-50 rounded-lg">
-                                <div class="text-sm text-purple-700">Heart Rate</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->heart_rate }} bpm</div>
+                            <div class="p-4 bg-gradient-to-r from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-lg">
+                                <div class="text-sm text-pink-700 dark:text-pink-300 mb-2 flex items-center">
+                                    <i class="fas fa-heartbeat mr-2"></i>
+                                    Heart Rate
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->heart_rate }} bpm
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->respiration_rate)
-                            <div class="p-3 bg-purple-50 rounded-lg">
-                                <div class="text-sm text-purple-700">Respiration Rate</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->respiration_rate }} /min</div>
+                            <div class="p-4 bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-900/20 dark:to-teal-800/20 rounded-lg">
+                                <div class="text-sm text-teal-700 dark:text-teal-300 mb-2 flex items-center">
+                                    <i class="fas fa-lungs mr-2"></i>
+                                    Respiration Rate
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->respiration_rate }} /min
+                                </div>
                             </div>
                             @endif
 
                             @if($examination->temperature)
-                            <div class="p-3 bg-yellow-50 rounded-lg">
-                                <div class="text-sm text-yellow-700">Temperature</div>
-                                <div class="text-lg font-medium text-gray-900">{{ $examination->temperature }} °C</div>
+                            <div class="p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-lg">
+                                <div class="text-sm text-orange-700 dark:text-orange-300 mb-2 flex items-center">
+                                    <i class="fas fa-thermometer-half mr-2"></i>
+                                    Temperature
+                                </div>
+                                <div class="text-xl font-bold text-gray-900 dark:text-white">
+                                    {{ $examination->temperature }} °C
+                                </div>
                             </div>
                             @endif
                         </div>
 
                         @if(!$examination->height && !$examination->weight && !$examination->blood_pressure)
-                        <div class="text-center py-4 text-gray-500">
-                            No vital signs recorded
+                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-clipboard-question text-3xl mb-3"></i>
+                            <p>No vital signs recorded</p>
                         </div>
                         @endif
                     </div>
                 </div>
 
-                <!-- Doctor Notes -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <!-- Doctor Notes & Files -->
+                <div class="card">
                     <div class="p-6">
-                        <h4 class="text-lg font-semibold text-gray-900 mb-4">Doctor Notes</h4>
-                        <div class="prose max-w-none">
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                            <i class="fas fa-stethoscope mr-3 text-blue-500"></i>
+                            Doctor Notes
+                        </h4>
+
+                        <div class="prose max-w-none dark:prose-invert">
+                            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg whitespace-pre-line">
                                 {{ $examination->doctor_notes }}
                             </div>
                         </div>
 
                         @if($examination->external_file_path)
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <h5 class="text-sm font-medium text-gray-700 mb-2">Attached File</h5>
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">External Examination File</div>
-                                    <a href="{{ Storage::url($examination->external_file_path) }}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800">
-                                        View File
-                                    </a>
+                        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center">
+                                <i class="fas fa-paperclip mr-2"></i>
+                                Attached File
+                            </h5>
+                            <div class="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <i class="fas fa-file-medical text-gray-400 dark:text-gray-500 text-2xl mr-3"></i>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900 dark:text-white">
+                                        External Examination File
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                        Uploaded on {{ $examination->created_at->format('d M Y') }}
+                                    </div>
                                 </div>
+                                <a href="{{ Storage::url($examination->external_file_path) }}" target="_blank"
+                                   class="btn btn-secondary text-sm px-3 py-1">
+                                    <i class="fas fa-eye mr-1"></i> View
+                                </a>
                             </div>
                         </div>
                         @endif
@@ -143,73 +220,95 @@
             @php
                 $examination->load(['prescription.items']);
             @endphp
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div class="card mb-6">
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">Prescription Details</h4>
-                        <span class="px-3 py-1 text-sm font-semibold rounded-full
-                            {{ $examination->prescription->status == 'completed' ? 'bg-green-100 text-green-800' :
-                               ($examination->prescription->status == 'processed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+                            <i class="fas fa-prescription-bottle-alt mr-3 text-purple-500"></i>
+                            Prescription Details
+                        </h4>
+                        <span class="badge {{ $examination->prescription->status == 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                               ($examination->prescription->status == 'processed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                               'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200') }}">
+                            <i class="fas fa-circle text-xs mr-1"></i>
                             {{ ucfirst($examination->prescription->status) }}
                         </span>
                     </div>
 
                     @if($examination->prescription->notes)
-                    <div class="mb-4">
-                        <div class="text-sm font-medium text-gray-700">Prescription Notes</div>
-                        <div class="mt-1 p-3 bg-gray-50 rounded-lg">{{ $examination->prescription->notes }}</div>
+                    <div class="mb-6">
+                        <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                            <i class="fas fa-notes-medical mr-2"></i>
+                            Prescription Notes
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                            {{ $examination->prescription->notes }}
+                        </div>
                     </div>
                     @endif
 
                     @if($examination->prescription->items->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Medicine
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Quantity
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Unit Price
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Subtotal
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                                         Instructions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach($examination->prescription->items as $item)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $item->medicine_name }}</div>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <td class="px-4 py-4">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-pills text-purple-500 mr-3"></i>
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                                {{ $item->medicine_name }}
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $item->quantity }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-900 dark:text-white">
+                                            {{ $item->quantity }}
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ $item->formatted_unit_price }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-900 dark:text-white">
+                                            {{ $item->formatted_unit_price }}
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $item->formatted_subtotal }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                            {{ $item->formatted_subtotal }}
+                                        </div>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm text-gray-900">{{ $item->instructions ?? '-' }}</div>
+                                    <td class="px-4 py-4">
+                                        <div class="text-sm text-gray-900 dark:text-white max-w-xs">
+                                            {{ $item->instructions ?? '-' }}
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot class="bg-gray-50">
+                            <tfoot class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                                 <tr>
-                                    <td colspan="3" class="px-6 py-4 text-right text-sm font-medium text-gray-900">
+                                    <td colspan="3" class="px-4 py-4 text-right text-sm font-medium text-gray-900 dark:text-white">
                                         Total:
                                     </td>
-                                    <td colspan="2" class="px-6 py-4 text-sm font-bold text-gray-900">
+                                    <td colspan="2" class="px-4 py-4 text-sm font-bold text-gray-900 dark:text-white">
                                         {{ $examination->prescription->formatted_total_price }}
                                     </td>
                                 </tr>
@@ -217,54 +316,62 @@
                         </table>
                     </div>
                     @else
-                    <div class="text-center py-4 text-gray-500">
-                        No medicines prescribed
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-pills text-3xl mb-3"></i>
+                        <p>No medicines prescribed</p>
                     </div>
                     @endif
                 </div>
             </div>
             @else
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <!-- No Prescription -->
+            <div class="card mb-6">
                 <div class="p-6">
-                    <div class="text-center py-4">
-                        <svg class="h-12 w-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No prescription</h3>
-                        <p class="mt-1 text-sm text-gray-500">No prescription has been created for this examination.</p>
-                        <div class="mt-4">
-                            <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                Add Prescription
-                            </a>
+                    <div class="text-center py-8">
+                        <div class="w-20 h-20 bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-prescription-bottle-alt text-purple-500 dark:text-purple-400 text-3xl"></i>
                         </div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No prescription</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                            No prescription has been created for this examination. You can add a prescription by editing this examination.
+                        </p>
+                        <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="btn btn-primary">
+                            <i class="fas fa-prescription-bottle-alt mr-2"></i>
+                            Add Prescription
+                        </a>
                     </div>
                 </div>
             </div>
             @endif
 
             <!-- Status and Actions -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="card">
                 <div class="p-6">
-                    <div class="flex justify-between items-center">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between">
                         <div>
-                            <div class="text-sm text-gray-500">Examination Status</div>
-                            <div class="text-lg font-semibold text-gray-900">
-                                <span class="px-3 py-1 text-sm font-semibold rounded-full {{
-                                    $examination->status == 'completed' ? 'bg-green-100 text-green-800' :
-                                    ($examination->status == 'processed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800')
-                                }}">
+                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Examination Status</div>
+                            <div class="flex items-center">
+                                <span class="badge {{ $examination->status == 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                                        ($examination->status == 'processed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                                                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200') }}">
+                                    <i class="fas fa-circle text-xs mr-1"></i>
                                     {{ ucfirst($examination->status) }}
                                 </span>
+                                <div class="text-sm text-gray-500 dark:text-gray-400 ml-3">
+                                    Last updated: {{ $examination->updated_at->diffForHumans() }}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex space-x-3">
+                        <div class="flex space-x-3 mt-4 md:mt-0">
                             @if(!$examination->prescription || $examination->prescription->canBeEdited())
-                            <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                            <a href="{{ route('doctor.examinations.edit', $examination->id) }}" class="btn btn-primary">
+                                <i class="fas fa-edit mr-2"></i>
                                 Edit Examination
                             </a>
                             @endif
-                            <a href="{{ route('doctor.examinations.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                            <a href="{{ route('doctor.examinations.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-list mr-2"></i>
                                 Back to List
                             </a>
                         </div>
@@ -273,4 +380,37 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            if (themeIcon) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                }
+            });
+        }
+    </script>
+    @endpush
 </x-app-layout>
