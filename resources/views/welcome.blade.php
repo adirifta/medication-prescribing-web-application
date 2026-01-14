@@ -8,6 +8,48 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Script untuk Dark Mode -->
+    <script>
+        // Cek preferensi dark mode saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const html = document.documentElement;
+
+            // Cek localStorage untuk tema yang disimpan
+            const savedTheme = localStorage.getItem('theme') ||
+                              (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+            // Terapkan tema yang disimpan
+            if (savedTheme === 'dark') {
+                html.classList.add('dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                html.classList.remove('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+
+            // Toggle theme ketika tombol diklik
+            themeToggle.addEventListener('click', function() {
+                if (html.classList.contains('dark')) {
+                    // Ganti ke light mode
+                    html.classList.remove('dark');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    // Ganti ke dark mode
+                    html.classList.add('dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
 </head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <!-- Navbar -->
@@ -41,7 +83,7 @@
                     @endauth
 
                     <!-- Dark Mode Toggle -->
-                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                    <button id="theme-toggle" type="button" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
                         <i class="fas fa-moon text-gray-600 dark:text-yellow-400" id="theme-icon"></i>
                     </button>
                 </div>
@@ -77,7 +119,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Card 1 -->
-                <div class="card p-8">
+                <div class="card p-8 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm">
                     <div class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6">
                         <i class="fas fa-user-md text-white text-2xl"></i>
                     </div>
@@ -88,7 +130,7 @@
                 </div>
 
                 <!-- Card 2 -->
-                <div class="card p-8">
+                <div class="card p-8 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm">
                     <div class="w-16 h-16 gradient-medical rounded-2xl flex items-center justify-center mb-6">
                         <i class="fas fa-prescription-bottle-alt text-white text-2xl"></i>
                     </div>
@@ -99,7 +141,7 @@
                 </div>
 
                 <!-- Card 3 -->
-                <div class="card p-8">
+                <div class="card p-8 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl shadow-sm">
                     <div class="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mb-6">
                         <i class="fas fa-database text-white text-2xl"></i>
                     </div>
@@ -113,21 +155,21 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 bg-gradient-to-r from-primary-500 to-primary-700">
+    <section class="py-16 bg-gradient-to-r from-primary-500 to-primary-700 dark:from-primary-600 dark:to-primary-800">
         <div class="max-w-4xl mx-auto text-center px-4">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
                 Siap Menggunakan Sistem Digital?
             </h2>
-            <p class="text-xl text-primary-100 mb-8">
+            <p class="text-xl text-primary-100 dark:text-primary-200 mb-8">
                 Bergabung dengan sistem peresepan modern yang efisien.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="btn bg-white text-primary-700 hover:bg-gray-100 text-lg px-8 py-3">
+                    <a href="{{ url('/dashboard') }}" class="btn bg-white text-primary-700 hover:bg-gray-100 dark:hover:bg-gray-200 text-lg px-8 py-3">
                         <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
                     </a>
                 @else
-                    <a href="{{ route('register') }}" class="btn bg-white text-primary-700 hover:bg-gray-100 text-lg px-8 py-3">
+                    <a href="{{ route('register') }}" class="btn bg-white text-primary-700 hover:bg-gray-100 dark:hover:bg-gray-200 text-lg px-8 py-3">
                         <i class="fas fa-user-plus mr-2"></i>Daftar Gratis
                     </a>
                     <a href="{{ route('login') }}" class="btn bg-transparent border-2 border-white text-white hover:bg-white/10 text-lg px-8 py-3">
